@@ -1,0 +1,3 @@
+include ':armory'
+include ':app'
+rootProject.name = "ArmoryDemo"
