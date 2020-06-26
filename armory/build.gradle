@@ -33,6 +33,7 @@ dependencies {
     androidTestImplementation dep.junitExt
     androidTestImplementation dep.espresso
 
+    implementation dep.appcompat
     implementation dep.recyclerview
 
 }
