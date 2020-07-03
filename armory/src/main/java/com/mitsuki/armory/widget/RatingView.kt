@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import com.mitsuki.armory.R
 import com.mitsuki.armory.dp2px
+import kotlin.math.min
 
 class RatingView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -16,37 +18,22 @@ class RatingView @JvmOverloads constructor(
     var baseSize = dp2px(16f)
         set(value) {
             field = value
-            borderDrawable?.setBounds(0, 0, value, value)
-            halfDrawable?.setBounds(0, 0, value, value)
-            solidDrawable?.setBounds(0, 0, value, value)
+            postInvalidate()
         }
 
     var intervalPadding = dp2px(2f)
     var maxRating = 5
     var rating = -1f
 
+    var adaptive = true
+        set(value) {
+            field = value
+            postInvalidate()
+        }
+
     var borderDrawable = obtainDrawable(R.drawable.ic_baseline_star_border_16)
-        set(value) {
-            field = value
-            field?.setBounds(0, 0, baseSize, baseSize)
-        }
     var halfDrawable = obtainDrawable(R.drawable.ic_baseline_star_half_16)
-        set(value) {
-            field = value
-            field?.setBounds(0, 0, baseSize, baseSize)
-        }
     var solidDrawable = obtainDrawable(R.drawable.ic_baseline_star_16)
-        set(value) {
-            field = value
-            field?.setBounds(0, 0, baseSize, baseSize)
-        }
-
-    init {
-        borderDrawable!!.setBounds(0, 0, baseSize, baseSize)
-        halfDrawable!!.setBounds(0, 0, baseSize, baseSize)
-        solidDrawable!!.setBounds(0, 0, baseSize, baseSize)
-    }
-
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
@@ -54,15 +41,30 @@ class RatingView @JvmOverloads constructor(
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        var width = when (widthMode) {
-            MeasureSpec.EXACTLY -> widthSize
+        val width = when (widthMode) {
+            MeasureSpec.EXACTLY -> {
+                if (adaptive) {
+                    baseSize =
+                        (widthSize - paddingLeft - paddingRight - (maxRating - 1) * intervalPadding) / maxRating
+                }
+                widthSize
+            }
             else -> baseSize * maxRating + (maxRating - 1) * intervalPadding + paddingLeft + paddingRight
         }
 
-        var height = when (heightMode) {
-            MeasureSpec.EXACTLY -> heightSize
+        val height = when (heightMode) {
+            MeasureSpec.EXACTLY -> {
+                if (adaptive) {
+                    baseSize = min(heightSize - paddingTop - paddingBottom, baseSize)
+                }
+                heightSize
+            }
             else -> baseSize + paddingTop + paddingBottom
         }
+
+        borderDrawable?.setBounds(0, 0, baseSize, baseSize)
+        halfDrawable?.setBounds(0, 0, baseSize, baseSize)
+        solidDrawable?.setBounds(0, 0, baseSize, baseSize)
 
         setMeasuredDimension(width, height)
     }
@@ -104,7 +106,5 @@ class RatingView @JvmOverloads constructor(
     }
 
     private fun obtainDrawable(@DrawableRes id: Int): Drawable? =
-        ResourcesCompat.getDrawable(resources, id, null)?.apply {
-            setBounds(0, 0, baseSize, baseSize)
-        }
+        ResourcesCompat.getDrawable(resources, id, null)
 }
