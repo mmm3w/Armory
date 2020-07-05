@@ -29,9 +29,11 @@ dependencies {
 
     implementation dep.kotlinStdlibJdk8
     implementation dep.coreKtx
+    implementation dep.appcompat
 
     testImplementation dep.junit
     androidTestImplementation dep.junitExt
     androidTestImplementation dep.espresso
 
+    implementation project(':armory')
 }
