@@ -61,7 +61,7 @@ class TagsView @JvmOverloads constructor(
                         if (tempWidth > limitedWidth) {
                             //该view属于下一行
                             //重置临时参数
-                            tempWidth = 0  //用于保证下次累加判断
+                            tempWidth = measuredWidth  //用于保证下次累加判断
                             tempHeight = 0  //因为换行了，所以当前行的最高高度清零
                         } else {
                             //该view属于本行
@@ -113,17 +113,16 @@ class TagsView @JvmOverloads constructor(
             MeasureSpec.EXACTLY -> heightSize
             MeasureSpec.AT_MOST -> heightSize.coerceAtMost(currentHeight)
                 .coerceAtMost(limitedHeight)
-            else -> currentHeight
+            else -> currentHeight.coerceAtLeast(firstView.measuredHeight)
         }
 
         setMeasuredDimension(resultWidth, resultHeight)
-
     }
 
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         if (childCount < 1) return
-
+        //直接先布局第一个view
         val firstChild = getChildAt(0)
         firstChild.layout(l, t, l + firstChild.measuredWidth, t + firstChild.measuredHeight)
 
@@ -132,13 +131,16 @@ class TagsView @JvmOverloads constructor(
         var leftOffset = 0
         var topOffset = t
 
+        var tempHeight = 0
+
         for (i in 1 until childCount) {
             getChildAt(i).run {
-                if (startLeft + leftOffset + measuredWidth > maxWidth) {
+                if (leftOffset != 0 && startLeft + leftOffset + measuredWidth > maxWidth) {
+                    //该到下一行了
                     leftOffset = 0
-                    topOffset += measuredHeight
+                    topOffset += tempHeight
+                    tempHeight = 0
                 }
-
                 layout(
                     startLeft + leftOffset,
                     topOffset,
@@ -146,6 +148,7 @@ class TagsView @JvmOverloads constructor(
                     topOffset + measuredHeight
                 )
                 leftOffset += measuredWidth
+                tempHeight = tempHeight.coerceAtLeast(measuredHeight)
             }
         }
 
