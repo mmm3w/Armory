@@ -147,7 +147,7 @@ class TagsView @JvmOverloads constructor(
                     currentWidth +
                             firstView.measureWidthWithMargin() + paddingStart + paddingEnd
                 )
-            else -> currentWidth + firstView.measureWidthWithMargin()
+            else -> currentWidth + firstView.measureWidthWithMargin() + paddingStart + paddingEnd
         }
 
         val resultHeight = when (heightMode) {
@@ -155,7 +155,7 @@ class TagsView @JvmOverloads constructor(
             MeasureSpec.AT_MOST -> heightSize
                 .coerceAtMost(currentHeight + paddingTop + paddingBottom)
                 .coerceAtMost(limitedHeight)
-            else -> currentHeight.coerceAtLeast(firstView.measureHeightWithMargin())
+            else -> currentHeight.coerceAtLeast(firstView.measureHeightWithMargin()) + paddingTop + paddingBottom
         }
 
         setMeasuredDimension(resultWidth, resultHeight)

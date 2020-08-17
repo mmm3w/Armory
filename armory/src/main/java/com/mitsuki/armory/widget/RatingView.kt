@@ -4,12 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import com.mitsuki.armory.R
-import com.mitsuki.armory.dp2px
+import com.mitsuki.armory.extend.dp2px
 import kotlin.math.min
 
 class RatingView @JvmOverloads constructor(

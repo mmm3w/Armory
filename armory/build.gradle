@@ -42,6 +42,9 @@ dependencies {
     androidTestImplementation dep.junitExt
     androidTestImplementation dep.espresso
 
+    implementation dep.arouterApi
+
+
     implementation dep.appcompat
     implementation dep.recyclerview
 
