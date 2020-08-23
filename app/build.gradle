@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
-    buildToolsVersion rootProject.ext.android["buildToolsVersion"]
+    compileSdkVersion build_versions.compile_sdk
+    buildToolsVersion build_versions.build_tools
 
     defaultConfig {
         applicationId "com.mitsuki.armorydemo"
-        minSdkVersion rootProject.ext.android["minSdkVersion"]
-        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode 1
         versionName "1.0"
 
@@ -27,13 +27,13 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation dep.kotlinStdlibJdk8
-    implementation dep.coreKtx
-    implementation dep.appcompat
+    implementation deps.kotlin.stdlib
+    implementation deps.core_ktx
+    implementation deps.appcompat
 
-    testImplementation dep.junit
-    androidTestImplementation dep.junitExt
-    androidTestImplementation dep.espresso
+    testImplementation deps.junit
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.espresso.core
 
 
     implementation project(':armory')

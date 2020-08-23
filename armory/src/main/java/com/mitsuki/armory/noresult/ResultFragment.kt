@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 class ResultFragment : Fragment() {
 
     private val callbacks =
-            SparseArray<(requestCode: Int, resultCode: Int, data: Intent?) -> Unit>()
-    private val permissionCallbacks =
-            SparseArray<(requestCode: Int, permissions: Array<String>, grantResults: IntArray) -> Unit>()
+        SparseArray<(requestCode: Int, resultCode: Int, data: Intent?) -> Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,9 +18,9 @@ class ResultFragment : Fragment() {
     /******************************************************************************************************************/
 
     fun startActivityForResult(
-            intent: Intent,
-            requestCode: Int,
-            callback: (requestCode: Int, resultCode: Int, data: Intent?) -> Unit
+        intent: Intent,
+        requestCode: Int,
+        callback: (requestCode: Int, resultCode: Int, data: Intent?) -> Unit
     ) {
         callbacks.put(requestCode, callback)
         startActivityForResult(intent, requestCode)
@@ -31,16 +29,5 @@ class ResultFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbacks.get(requestCode)?.invoke(requestCode, resultCode, data)
         callbacks.remove(requestCode)
-    }
-
-    /******************************************************************************************************************/
-
-    override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
-    ) {
-        permissionCallbacks.get(requestCode)?.invoke(requestCode, permissions, grantResults)
-        permissionCallbacks.remove(requestCode)
     }
 }

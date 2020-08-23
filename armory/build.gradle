@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
-    buildToolsVersion rootProject.ext.android["buildToolsVersion"]
+    compileSdkVersion build_versions.compile_sdk
+    buildToolsVersion build_versions.build_tools
 
     defaultConfig {
-        minSdkVersion rootProject.ext.android["minSdkVersion"]
-        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode 1
         versionName "1.0"
 
@@ -36,16 +36,16 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation dep.kotlinStdlibJdk8
-    implementation dep.coreKtx
-    testImplementation dep.junit
-    androidTestImplementation dep.junitExt
-    androidTestImplementation dep.espresso
+    implementation deps.kotlin.stdlib
+    implementation deps.core_ktx
+    testImplementation deps.junit
+    androidTestImplementation deps.atsl.ext_junit
+    androidTestImplementation deps.espresso.core
 
-    implementation dep.arouterApi
+    implementation deps.arouter
 
 
-    implementation dep.appcompat
-    implementation dep.recyclerview
+    implementation deps.appcompat
+    implementation deps.recyclerview
 
 }
