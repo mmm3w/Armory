@@ -75,9 +75,8 @@ deps.espresso = espresso
 /**************************************************************************************************/
 deps.appcompat = "androidx.appcompat:appcompat:$versions.appcompat"
 deps.recyclerview = "androidx.recyclerview:recyclerview:$versions.recyclerview"
-deps.recyclerview = "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swiperefreshlayout"
+deps.swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swiperefreshlayout"
 deps.constraintlayout = "androidx.constraintlayout:constraintlayout:$versions.constraintlayout"
-deps.swiperefreshlayout = "androidx.constraintlayout:constraintlayout:$versions.constraintlayout"
 deps.material = "com.google.android.material:material:$versions.material"
 deps.preference = "androidx.preference:preference-ktx:$versions.preference"
 
@@ -87,7 +86,7 @@ def hilt = [:]
 hilt.plugin = "com.google.dagger:hilt-android-gradle-plugin:$versions.hilt"
 hilt.android = "com.google.dagger:hilt-android:$versions.hilt"
 hilt.android_compiler = "com.google.dagger:hilt-android-compiler:$versions.hilt"
-hilt.compiler = "androidx.hilt:hilt-compiler::$versions.hilt_ext"
+hilt.compiler = "androidx.hilt:hilt-compiler:$versions.hilt_ext"
 hilt.lifecycle_viewmodel = "androidx.hilt:hilt-lifecycle-viewmodel:$versions.hilt_ext"
 deps.hilt = hilt
 
