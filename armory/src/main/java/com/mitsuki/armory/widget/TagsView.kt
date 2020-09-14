@@ -10,6 +10,8 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
+import com.mitsuki.armory.extend.marginHorizontal
+import com.mitsuki.armory.extend.marginVertical
 
 class TagsView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -69,12 +71,12 @@ class TagsView @JvmOverloads constructor(
         //除去第一个view，其他view尺寸限制范围
         val limitedWidth = when (widthMode) {
             MeasureSpec.UNSPECIFIED -> -1
-            else -> (widthSize - firstView.measuredWidth - paddingStart - paddingEnd)
+            else -> (widthSize - firstView.measuredWidth - firstView.marginHorizontal() - paddingStart - paddingEnd)
                 .coerceAtLeast(0)
         }
         val limitedHeight = when (heightMode) {
             MeasureSpec.UNSPECIFIED -> -1
-            else -> (heightSize - firstView.measuredHeight - paddingBottom - paddingTop)
+            else -> (heightSize - firstView.measuredHeight - firstView.marginVertical() - paddingBottom - paddingTop)
                 .coerceAtLeast(0)
         }
 
@@ -83,10 +85,14 @@ class TagsView @JvmOverloads constructor(
         var currentWidth = 0
         var currentHeight = 0
 
-        //TODO:改造measureChild中的spec参数，其中建议size需要重新给定
+        val newWidthMeasureSpec = if (limitedWidth > -1) MeasureSpec.makeMeasureSpec(
+            limitedWidth,
+            widthMode
+        ) else widthMeasureSpec
+
         for (i in 1 until childCount) {
             getChildAt(i).run {
-                measureChildWithMargins(this, widthMeasureSpec, 0, heightMeasureSpec, 0)
+                measureChildWithMargins(this, newWidthMeasureSpec, 0, heightMeasureSpec, 0)
                 when (widthMode) {
                     MeasureSpec.EXACTLY -> {
                         //tempHeight用于存储当前行最大的view的高度，是作为一个预计累加的高度
