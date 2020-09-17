@@ -1,9 +1,14 @@
 package com.mitsuki.armory.extend
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
+import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
 
 /** toast *****************************************************************************************/
@@ -29,4 +34,15 @@ fun Activity.hideSoftInput() =
             .hideSoftInputFromWindow(it.windowToken, 0)
     } ?: false
 
+@ColorInt
+@SuppressLint("Recycle")
+fun Context.themeColor(
+    @AttrRes themeAttrId: Int
+): Int {
+    return obtainStyledAttributes(
+        intArrayOf(themeAttrId)
+    ).use {
+        it.getColor(0, Color.MAGENTA)
+    }
+}
 

@@ -1,6 +1,8 @@
 package com.mitsuki.armory.imagegesture
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
@@ -9,12 +11,18 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.Transformation
 import android.widget.ImageView
+import android.widget.OverScroller
+import androidx.core.view.ViewCompat
+import com.mitsuki.armory.extend.isAnimationRunning
 import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 @SuppressLint("ClickableViewAccessibility")
-class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
+class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTouchListener,
     View.OnLayoutChangeListener {
 
     var startType = StartType.AUTO_LEFT
@@ -29,93 +37,19 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
     private val mDisplayRect = RectF()
     private val mMatrixValues = FloatArray(9)
 
+    private var mScaleUpAnimation: Animation? = null
+    private var mScaleDownAnimation: Animation? = null
+
     //启用mSlideType阈值，除非超过阈值，否则都为NONE mode
     private var mScaleThreshold = 0.0f
 
-    private val mScaleGestureDetector = ScaleGestureDetector(
-        mImageView.context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
-            override fun onScale(detector: ScaleGestureDetector?): Boolean {
-                return detector?.run {
-                    var handled = false
-                    val currentScale = mDecoMatrix.getScale()
-                    if (scaleFactor > 1f && currentScale < MAX_SCALE) {
-                        if (currentScale * scaleFactor > MAX_SCALE) {
-                            mDecoMatrix.postScale(
-                                MAX_SCALE / currentScale, MAX_SCALE / currentScale,
-                                focusX, focusY
-                            )
-                        } else {
-                            mDecoMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
-                        }
-                        updateImageMatrix()
-                        handled = true
-                    }
-
-                    if (scaleFactor < 1f && currentScale > 1f) {
-                        if (currentScale * scaleFactor < 1f) {
-                            mDecoMatrix.postScale(
-                                1f / currentScale, 1f / currentScale, focusX, focusY
-                            )
-                        } else {
-                            mDecoMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
-                        }
-                        updateImageMatrix()
-                        handled = true
-                    }
-                    handled
-                } ?: false
-            }
-        })
-    private val mGestureDetector =
-        GestureDetector(mImageView.context, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onScroll(
-                e1: MotionEvent?,
-                e2: MotionEvent?,
-                distanceX: Float,
-                distanceY: Float
-            ): Boolean {
-                var handled = false
-                val viewWidth = mImageView.width
-                val viewHeight = mImageView.height
-                finalMatrix.getDisplayRect()
-                if (distanceX > 0) {
-                    if (mDisplayRect.right > viewWidth) handled = true
-                } else {
-                    if (mDisplayRect.left < 0f) handled = true
-                }
-                if (distanceY > 0) {
-                    if (mDisplayRect.bottom > viewHeight) handled = true
-                } else {
-                    if (mDisplayRect.top < 0f) handled = true
-                }
-                if (handled) {
-                    mDecoMatrix.postTranslate(-distanceX, -distanceY)
-                    updateImageMatrix()
-                }
-                return handled
-            }
-
-            override fun onFling(
-                e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float
-            ): Boolean {
-                Log.e("asdf","onFling velocityX $velocityX | velocityY $velocityY")
-                return super.onFling(e1, e2, velocityX, velocityY)
-            }
-
-            override fun onDoubleTap(e: MotionEvent?): Boolean {
-                val currentScale = mDecoMatrix.getScale()
-                if (currentScale > 1f) {
-                    mDecoMatrix.postScale(1f / currentScale, 1f / currentScale)
-                } else {
-                    mDecoMatrix.postScale(MAX_SCALE / currentScale, MAX_SCALE / currentScale)
-                }
-                updateImageMatrix()
-                return true
-            }
-        })
+    private val mCurrentFlingRunnable = FlingAnimation()
+    private val mScaleGestureDetector = ScaleGestureDetector(mImageView.context, this)
+    private val mGestureDetector = GestureDetector(mImageView.context, this)
 
     companion object {
-        const val MAX_SCALE = 3.0f
+        private const val MAX_SCALE = 3.0f
+        private const val SCALE_DURATION = 300
     }
 
     init {
@@ -124,7 +58,95 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
         mImageView.addOnLayoutChangeListener(this)
     }
 
+    /** GestureListener ***************************************************************************/
+    override fun onScale(detector: ScaleGestureDetector?): Boolean {
+        return detector?.run {
+            var handled = false
+            val currentScale = mDecoMatrix.getScale()
+            if (scaleFactor > 1f && currentScale < MAX_SCALE) {
+                if (currentScale * scaleFactor > MAX_SCALE) {
+                    mDecoMatrix.postScale(
+                        MAX_SCALE / currentScale, MAX_SCALE / currentScale,
+                        focusX, focusY
+                    )
+                } else {
+                    mDecoMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
+                }
+                updateImageMatrix()
+                handled = true
+            }
+
+            if (scaleFactor < 1f && currentScale > 1f) {
+                if (currentScale * scaleFactor < 1f) {
+                    mDecoMatrix.postScale(
+                        1f / currentScale, 1f / currentScale, focusX, focusY
+                    )
+                } else {
+                    mDecoMatrix.postScale(scaleFactor, scaleFactor, focusX, focusY)
+                }
+                updateImageMatrix()
+                handled = true
+            }
+            handled
+        } ?: false
+    }
+
+    override fun onScroll(
+        e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float
+    ): Boolean {
+        var handled = false
+        val viewWidth = mImageView.width
+        val viewHeight = mImageView.height
+        finalMatrix.getDisplayRect()
+        if (distanceX > 0) {
+            if (mDisplayRect.right > viewWidth) handled = true
+        } else {
+            if (mDisplayRect.left < 0f) handled = true
+        }
+        if (distanceY > 0) {
+            if (mDisplayRect.bottom > viewHeight) handled = true
+        } else {
+            if (mDisplayRect.top < 0f) handled = true
+        }
+        if (handled) {
+            mDecoMatrix.postTranslate(-distanceX, -distanceY)
+            updateImageMatrix()
+        }
+        return handled
+    }
+
+    override fun onFling(
+        e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float
+    ): Boolean {
+        //velocityX < 0 手指向左滑动
+        //velocityY > 0 手指向右滑动
+        //velocityY > 0 手指向下滑动
+        //velocityY < 0 手指向上滑动
+        mCurrentFlingRunnable.fling(-velocityX.roundToInt(), -velocityY.roundToInt())
+        mImageView.post(mCurrentFlingRunnable)
+        return true
+    }
+
+    override fun onDoubleTap(e: MotionEvent?): Boolean {
+        e?.apply {
+            val currentScale = mDecoMatrix.getScale()
+            if (currentScale > 1f) {
+                if (!mScaleDownAnimation.isAnimationRunning())
+                    mScaleDownAnimation = startScaleDown(e.x, e.y, currentScale)
+            } else {
+                if (!mScaleUpAnimation.isAnimationRunning())
+                    mScaleUpAnimation = startScaleUp(e.x, e.y, currentScale)
+            }
+        }
+        return true
+    }
+
+    /** View.OnTouchListener **********************************************************************/
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        if (event?.actionMasked == MotionEvent.ACTION_DOWN) {
+            mCurrentFlingRunnable.finish()
+            mImageView.clearAnimation()
+        }
         var handled = false
         if (mScaleGestureDetector.onTouchEvent(event)) {
             handled = true
@@ -135,6 +157,7 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
         return handled
     }
 
+    /** View.OnLayoutChangeListener ***************************************************************/
     override fun onLayoutChange(
         v: View?, left: Int, top: Int, right: Int, bottom: Int,
         oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int
@@ -212,7 +235,7 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
         mImageView.imageMatrix = finalMatrix
     }
 
-    fun updateImageMatrix() {
+    private fun updateImageMatrix() {
         checkDecoMatrix()
         mImageView.imageMatrix = finalMatrix
     }
@@ -251,6 +274,42 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
         mDecoMatrix.postTranslate(offsetX, offsetY)
     }
 
+    private fun startScaleUp(px: Float, py: Float, start: Float): Animation {
+        return object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+                val currentScale = mDecoMatrix.getScale()
+                val targetScale = (MAX_SCALE - start) * interpolatedTime + start
+                mDecoMatrix.postScale(
+                    targetScale / currentScale, targetScale / currentScale,
+                    px, py
+                )
+                updateImageMatrix()
+            }
+        }.apply {
+            duration = SCALE_DURATION.toLong()
+            mImageView.clearAnimation()
+            mImageView.startAnimation(this)
+        }
+    }
+
+    private fun startScaleDown(px: Float, py: Float, start: Float): Animation {
+        return object : Animation() {
+            override fun applyTransformation(interpolatedTime: Float, t: Transformation) {
+                val currentScale = mDecoMatrix.getScale()
+                val targetScale = start - (start - 1f) * interpolatedTime
+                mDecoMatrix.postScale(
+                    targetScale / currentScale, targetScale / currentScale,
+                    px, py
+                )
+                updateImageMatrix()
+            }
+        }.apply {
+            duration = SCALE_DURATION.toLong()
+            mImageView.clearAnimation()
+            mImageView.startAnimation(this)
+        }
+    }
+
     private fun Matrix.getDisplayRect() {
         val drawable: Drawable = mImageView.drawable ?: return
         mDisplayRect.set(
@@ -262,7 +321,7 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
         mapRect(mDisplayRect)
     }
 
-    fun Matrix.getScale(): Float {
+    private fun Matrix.getScale(): Float {
         return sqrt(
             getValue(Matrix.MSCALE_X).toDouble().pow(2.0)
                     + getValue(Matrix.MSKEW_Y).toDouble().pow(2.0)
@@ -280,4 +339,54 @@ class ImageGesture(private val mImageView: ImageView) : View.OnTouchListener,
             postConcat(mDecoMatrix)
         }
 
+    private inner class FlingAnimation : Runnable {
+        private val mScroller: OverScroller = OverScroller(mImageView.context)
+        private var mCurrentX: Int = 0
+        private var mCurrentY: Int = 0
+
+        override fun run() {
+            if (mScroller.isFinished) return
+            if (mScroller.computeScrollOffset()) {
+                val newX = mScroller.currX
+                val newY = mScroller.currY
+                mDecoMatrix.postTranslate(
+                    (mCurrentX - newX).toFloat(),
+                    (mCurrentY - newY).toFloat()
+                )
+                updateImageMatrix()
+                mCurrentX = newX
+                mCurrentY = newY
+                ViewCompat.postOnAnimation(mImageView, this);
+            }
+        }
+
+        fun fling(velocityX: Int, velocityY: Int) {
+            finalMatrix.getDisplayRect()
+            val viewWidth = mImageView.width
+            val viewHeight = mImageView.height
+            val (startX: Int, startY: Int) =
+                -mDisplayRect.left.roundToInt() to -mDisplayRect.top.roundToInt()
+            mCurrentX = startX
+            mCurrentY = startY
+            /*
+             * Minimum and maximum scroll positions. The minimum scroll
+             * position is generally zero and the maximum scroll position
+             * is generally the content size less the screen size. So if the
+             * content width is 1000 pixels and the screen width is 200
+             * pixels, the maximum scroll offset should be 800 pixels.
+             */
+            val (minX: Int, minY: Int) = 0 to 0
+            val (maxX: Int, maxY: Int) =
+                (mDisplayRect.width() - viewWidth).coerceAtLeast(0f).roundToInt() to
+                        (mDisplayRect.height() - viewHeight).coerceAtLeast(0f).roundToInt()
+            if (maxX != 0 || maxY != 0) {
+                mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY)
+            }
+        }
+
+        fun finish() {
+            mScroller.forceFinished(true)
+        }
+
+    }
 }
