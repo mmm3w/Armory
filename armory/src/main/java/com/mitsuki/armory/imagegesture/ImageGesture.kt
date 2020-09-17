@@ -242,8 +242,8 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
 
     private fun checkDecoMatrix() {
         finalMatrix.getDisplayRect()
-        val viewWidth = mImageView.width  //view的宽度
-        val viewHeight = mImageView.height  //view的高度
+        val viewWidth = mImageView.width
+        val viewHeight = mImageView.height
         var offsetX = 0f
         var offsetY = 0f
 
@@ -356,7 +356,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
                 updateImageMatrix()
                 mCurrentX = newX
                 mCurrentY = newY
-                ViewCompat.postOnAnimation(mImageView, this);
+                ViewCompat.postOnAnimation(mImageView, this)
             }
         }
 
