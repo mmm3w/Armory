@@ -11,16 +11,16 @@ fun px2dp(pxValue: Float): Float {
     return pxValue / Resources.getSystem().displayMetrics.density
 }
 
-fun statusBarHeight(context: Context): Int {
-    val id = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+fun Context.statusBarHeight(): Int {
+    val id = resources.getIdentifier("status_bar_height", "dimen", "android")
     if (id > 0)
-        return context.resources.getDimensionPixelSize(id)
+        return resources.getDimensionPixelSize(id)
     return 0
 }
 
-fun navigationBarHeight(context: Context): Int {
-    val id = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
+fun Context.navigationBarHeight(): Int {
+    val id = resources.getIdentifier("navigation_bar_height", "dimen", "android")
     if (id > 0)
-        return context.resources.getDimensionPixelSize(id)
+        return resources.getDimensionPixelSize(id)
     return 0
 }

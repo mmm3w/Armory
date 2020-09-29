@@ -1,4 +1,4 @@
-package com.mitsuki.armory.empty
+package com.mitsuki.armory.adapter.empty
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

@@ -1,4 +1,4 @@
-package com.mitsuki.armory
+package com.mitsuki.armory.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 
@@ -24,5 +24,11 @@ inline fun <reified T> calculateDiff(
     oldList: Array<T>,
     newList: Array<T>
 ): DiffUtil.DiffResult {
-    return DiffUtil.calculateDiff(DataDiff(diff, oldList, newList))
+    return DiffUtil.calculateDiff(
+        DataDiff(
+            diff,
+            oldList,
+            newList
+        )
+    )
 }

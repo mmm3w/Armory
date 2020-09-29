@@ -1,11 +1,10 @@
 package com.mitsuki.armory.extend
 
+import android.app.Activity
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.IdRes
-import androidx.core.view.marginBottom
-import androidx.core.view.marginEnd
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
+import androidx.core.view.*
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -34,4 +33,26 @@ fun RecyclerView.addOnScrollListenerBy(
 
 fun <V : View> RecyclerView.ViewHolder.view(@IdRes id: Int): V? {
     return itemView.findViewById(id)
+}
+
+fun Activity.paddingStatusBarHeight(@IdRes id: Int) {
+    findViewById<View>(id)?.apply { paddingStatusBarHeight(this) }
+}
+
+fun Activity.paddingStatusBarHeight(view: View) {
+    with(view) {
+        setPadding(paddingLeft, paddingTop + statusBarHeight(), paddingRight, paddingBottom)
+    }
+}
+
+fun Activity.marginStatusBarHeight(@IdRes id: Int) {
+    findViewById<View>(id)?.apply { marginStatusBarHeight(this) }
+}
+
+fun Activity.marginStatusBarHeight(view: View) {
+    with(view) {
+        (layoutParams as? ViewGroup.MarginLayoutParams)?.setMargins(
+            marginLeft, marginTop + statusBarHeight(), marginRight, marginBottom
+        )
+    }
 }

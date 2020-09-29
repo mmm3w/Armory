@@ -1,4 +1,4 @@
-package com.mitsuki.armory.empty
+package com.mitsuki.armory.adapter.empty
 
 sealed class EmptyState(val isEmpty: Boolean) {
 
