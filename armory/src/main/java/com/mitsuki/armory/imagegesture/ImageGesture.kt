@@ -109,8 +109,11 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
             if (mDisplayRect.top < 0f) handled = true
         }
         if (handled) {
+            mImageView.parent?.requestDisallowInterceptTouchEvent(true)
             mDecoMatrix.postTranslate(-distanceX, -distanceY)
             updateImageMatrix()
+        } else {
+            mImageView.parent?.requestDisallowInterceptTouchEvent(false)
         }
         return handled
     }
@@ -146,6 +149,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
         if (event?.actionMasked == MotionEvent.ACTION_DOWN) {
             mCurrentFlingRunnable.finish()
             mImageView.clearAnimation()
+            v?.parent?.requestDisallowInterceptTouchEvent(true)
         }
         var handled = false
         if (mScaleGestureDetector.onTouchEvent(event)) {
@@ -280,8 +284,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
                 val currentScale = mDecoMatrix.getScale()
                 val targetScale = (MAX_SCALE - start) * interpolatedTime + start
                 mDecoMatrix.postScale(
-                    targetScale / currentScale, targetScale / currentScale,
-                    px, py
+                    targetScale / currentScale, targetScale / currentScale, px, py
                 )
                 updateImageMatrix()
             }
