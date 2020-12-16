@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class SingleItemAdapter(enable: Boolean) : RecyclerView.Adapter<SingleItemAdapter.ViewHolder>() {
 
-    var isEnable: Boolean = enable
+    open var isEnable: Boolean = enable
         set(value) {
             if (value != field) {
                 if (value && !field) {
