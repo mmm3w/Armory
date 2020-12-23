@@ -1,3 +1,6 @@
+include ':httprookie'
+include ':imagegesture'
+include ':adapter'
 include ':armory'
 include ':app'
 rootProject.name = "ArmoryDemo"

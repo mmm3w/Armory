@@ -37,7 +37,7 @@ versions.navigation = "2.3.0"
 
 versions.material_dialogs = '3.3.0'
 versions.jsoup = '1.13.1'
-versions.okhttp = '4.7.2'
+versions.okhttp = '4.9.0'
 versions.arouter = "1.5.0"
 /**************************************************************************************************/
 //gradle

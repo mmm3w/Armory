@@ -16,7 +16,6 @@ import android.view.animation.Transformation
 import android.widget.ImageView
 import android.widget.OverScroller
 import androidx.core.view.ViewCompat
-import com.mitsuki.armory.extend.isAnimationRunning
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
