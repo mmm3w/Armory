@@ -40,5 +40,6 @@ dependencies {
     androidTestImplementation deps.espresso.core
 
     implementation deps.okhttp
+    implementation deps.reactivex.rxjava3
 
 }

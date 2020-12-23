@@ -37,4 +37,5 @@ dependencies {
 
 
     implementation project(':armory')
+    implementation project(':httprookie')
 }
