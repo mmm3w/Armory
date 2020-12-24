@@ -35,6 +35,7 @@ dependencies {
     androidTestImplementation deps.atsl.ext_junit
     androidTestImplementation deps.espresso.core
 
+    implementation deps.reactivex.rxjava3
 
     implementation project(':armory')
     implementation project(':httprookie')
