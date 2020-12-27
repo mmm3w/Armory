@@ -1,36 +1,36 @@
 package com.mitsuki.armory.httprookie.request
 
 import com.mitsuki.armory.httprookie.HttpRookie
+import com.mitsuki.armory.httprookie.Mediator
 import com.mitsuki.armory.httprookie.callback.Callback
-import com.mitsuki.armory.httprookie.callback.DefaultCallbackConvert
 import com.mitsuki.armory.httprookie.callback.DefaultCallback
 import com.mitsuki.armory.httprookie.convert.Convert
 import com.mitsuki.armory.httprookie.observable.EnqueueObservable
+import com.mitsuki.armory.httprookie.observable.ObservableFactory
 import com.mitsuki.armory.httprookie.response.Response
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.Call
 import okhttp3.Request
 
-abstract class Request<T>(val url: String) {
-    //TODO 初始化检查
+@Suppress("MemberVisibilityCanBePrivate")
+abstract class Request<T>(val rawUrl: String) : UrlParams, Headers {
+    val mHttpRookie: HttpRookie = HttpRookie
+
+    lateinit var mMediator: Mediator<T>
     lateinit var convert: Convert<T>
 
-    private var mRequest: Request? = null
+    var tag: Any? = null
+    var rawRequest: Request? = null
+    var callback: Callback<T> = DefaultCallback()
 
-    private val mCallbackConvert: DefaultCallbackConvert<T> by lazy {
-        DefaultCallbackConvert(convert)
-    }
+    override val headers: LinkedHashMap<String, String> = LinkedHashMap()
+    override val urlParams: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
 
-    fun header(header: Pair<String, String>) {
-
-    }
-
-    fun params(param: Pair<String, String>) {
-
-    }
-
-    fun tag(tag: Any) {
-
+    init {
+        //默认的Accept-Language
+        //默认的User-Agent
+        header(mHttpRookie)
+        urlParams(mHttpRookie)
     }
 
     fun callback(
@@ -39,34 +39,48 @@ abstract class Request<T>(val url: String) {
         onError: ((response: Response.Fail<T?>) -> Unit)? = null,
         onFinish: (() -> Unit)? = null
     ) {
-        mCallbackConvert.callback = DefaultCallback(onStart, onSuccess, onError, onFinish)
+        this.callback = DefaultCallback(onStart, onSuccess, onError, onFinish)
     }
 
     fun callback(callback: Callback<T>) {
-        mCallbackConvert.callback = callback
+        this.callback = callback
     }
 
     abstract fun generateRequest(): Request
 
+    abstract fun generateRequestBuilder(): Request.Builder
+
+    fun url(): String = appendParams(rawUrl)
+
+    private fun mediator(): Mediator<T> {
+        if (!this::mMediator.isInitialized) {
+            mMediator = Mediator(this)
+        }
+        return mMediator
+    }
+
     fun generateCall(): Call {
         return generateRequest().let {
-            mRequest = it
-            HttpRookie.client.newCall(it)
+            rawRequest = it
+            mHttpRookie.client.newCall(it)
         }
     }
 
     //异步回调形式
     fun enqueue() {
-        generateCall().enqueue(mCallbackConvert)
+        mediator().execute(callback)
     }
 
-
     //同步调用
-    fun execute() {
-
+    fun execute(): Response<T?> {
+        return mediator().execute()
     }
 
     fun enqueueObservable(): Observable<Response<T?>> {
-        return EnqueueObservable(generateCall(), convert)
+        return ObservableFactory.obtain(mediator())
+    }
+
+    fun executeObservable(): Observable<Response<T?>> {
+        return ObservableFactory.obtain(mediator(), isAsync = false)
     }
 }

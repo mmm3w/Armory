@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.mitsuki.armory.httprookie.HttpRookie
 import com.mitsuki.armory.httprookie.convert.StringConvert
+import com.mitsuki.armory.httprookie.request.header
+import com.mitsuki.armory.httprookie.request.urlParams
 import com.mitsuki.armory.httprookie.response.Response
 import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -18,20 +18,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-//        HttpRookie.get<String>("https://www.baidu.com") {
+//        HttpRookie.get<String>("https://tcc.taobao.com/cc/json/mobile_tel_segment.htm") {
 //            convert = StringConvert()
+//            urlParams("tel" to "13858386438")
 //            callback(
 //                onSuccess = {
+//                    Log.e("asdf", "${it.requireBody()}")
 //                    main_content?.text = "4444"
 //                    main_content?.text = it.requireBody()
-//                },
-//                onError = {
-//
 //                }
 //            )
 //        }.enqueue()
 
-        HttpRookie.get<String>("https://www.baidu.com") { convert = StringConvert() }
+        HttpRookie.get<String>("https://tcc.taobao.com/cc/json/mobile_tel_segment.htm") {
+            urlParams("tel" to "13858386438")
+            convert = StringConvert()
+        }
             .enqueueObservable()
             .subscribe(
                 object : Observer<Response<String?>> {

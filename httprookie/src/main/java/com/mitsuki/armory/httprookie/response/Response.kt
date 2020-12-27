@@ -8,7 +8,7 @@ sealed class Response<T>(
     val rawResponse: okhttp3.Response?
 ) {
 
-    class Success<T>(body: T, rawCall: Call, rawResponse: okhttp3.Response) :
+    class Success<T>(body: T?, rawCall: Call, rawResponse: okhttp3.Response) :
         Response<T>(rawCall, body, rawResponse) {
 
         fun requireBody(): T {

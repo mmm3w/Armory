@@ -1,7 +1,7 @@
 package com.mitsuki.armory.httprookie.observable
 
-import com.mitsuki.armory.httprookie.callback.CallbackConvert
-import com.mitsuki.armory.httprookie.convert.Convert
+import com.mitsuki.armory.httprookie.Mediator
+import com.mitsuki.armory.httprookie.callback.Callback
 import com.mitsuki.armory.httprookie.response.Response
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
@@ -9,42 +9,38 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.exceptions.CompositeException
 import io.reactivex.rxjava3.exceptions.Exceptions
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
-import okhttp3.Call
 
-class EnqueueObservable<T>(private val mRawCall: Call, private val mConvert: Convert<T>) :
+internal class EnqueueObservable<T>(private val mMediator: Mediator<T>) :
     Observable<Response<T?>>() {
 
     override fun subscribeActual(observer: Observer<in Response<T?>>?) {
-        val call = mRawCall.clone()
-        val callback = Callback(call, observer, mConvert)
+        val mediator = mMediator.clone()
+        val callback = CallbackDisposable(mediator, observer)
         observer?.onSubscribe(callback)
-        call.enqueue(callback)
+        mediator.execute(callback)
     }
 
-
-    class Callback<T>(
-        private val mCall: Call,
-        private val mObserver: Observer<in Response<T?>>?,
-        convert: Convert<T>
+    private class CallbackDisposable<T>(
+        private val mMediator: Mediator<in T>,
+        private val mObserver: Observer<in Response<T?>>?
     ) :
-        Disposable, CallbackConvert<T>(convert) {
+        Disposable, Callback<T> {
 
         private var mIsTerminated = false
 
-
         override fun isDisposed(): Boolean {
-            return mCall.isCanceled()
+            return mMediator.isCanceled()
         }
 
         override fun dispose() {
-            mCall.cancel()
+            mMediator.cancel()
         }
 
         override fun onStart() {
         }
 
         override fun onSuccess(response: Response.Success<T?>) {
-            if (mCall.isCanceled()) return
+            if (mMediator.isCanceled()) return
             try {
                 mObserver?.onNext(response)
             } catch (e: Exception) {
@@ -57,7 +53,7 @@ class EnqueueObservable<T>(private val mRawCall: Call, private val mConvert: Con
         }
 
         override fun onError(response: Response.Fail<T?>) {
-            if (mCall.isCanceled()) return
+            if (mMediator.isCanceled()) return
 
             try {
                 mIsTerminated = true
@@ -69,7 +65,7 @@ class EnqueueObservable<T>(private val mRawCall: Call, private val mConvert: Con
         }
 
         override fun onFinish() {
-            if (mCall.isCanceled()) return
+            if (mMediator.isCanceled()) return
 
             try {
                 mIsTerminated = true
