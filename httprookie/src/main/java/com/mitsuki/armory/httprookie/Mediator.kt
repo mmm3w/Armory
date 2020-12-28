@@ -4,7 +4,6 @@ import com.mitsuki.armory.httprookie.callback.Callback
 import com.mitsuki.armory.httprookie.request.Request
 import com.mitsuki.armory.httprookie.response.Response
 import okhttp3.Call
-import java.io.IOException
 
 
 class Mediator<T>(private val mRequest: Request<T>) : Cloneable {
@@ -25,30 +24,32 @@ class Mediator<T>(private val mRequest: Request<T>) : Cloneable {
         return mRawCall
     }
 
+    private fun runOnUiThread(func: () -> Unit) {
+        HttpRookie.runOnUiThread(Runnable { func() })
+    }
+
     fun execute(cb: Callback<T>) {
         this.mCallback = cb
-        this.mCallback?.onStart()
-        prepareRawCall().enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                error { Response.Fail(e, call, null) }
-            }
-
-            override fun onResponse(call: Call, response: okhttp3.Response) {
-                val code = response.code
-                if (code == 404 || code >= 500) {
-                    error { Response.Fail(RuntimeException("404 or 50x"), call, response) }
-                    return
-                }
-                try {
-                    mRequest.convert.convertResponse(response).apply {
-                        success { Response.Success(this, call, response) }
+        runOnUiThread {
+            this.mCallback?.onStart()
+            prepareRawCall().enqueueBy(
+                onFailure = { call, e -> error { Response.Fail(e, call, null) } },
+                onResponse = { call, response ->
+                    val code = response.code
+                    if (code == 404 || code >= 500) {
+                        error { Response.Fail(RuntimeException("404 or 50x"), call, response) }
+                        return@enqueueBy
                     }
-                } catch (e: Exception) {
-                    error { Response.Fail(e, call, response) }
+                    try {
+                        mRequest.convert.convertResponse(response).apply {
+                            success { Response.Success(this, call, response) }
+                        }
+                    } catch (e: Exception) {
+                        error { Response.Fail(e, call, response) }
+                    }
                 }
-            }
-
-        })
+            )
+        }
     }
 
     fun execute(): Response<T?> {

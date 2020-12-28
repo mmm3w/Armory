@@ -41,5 +41,7 @@ dependencies {
 
     implementation deps.okhttp
     implementation deps.reactivex.rxjava3
+    implementation deps.reactivex.rxandroid
+
 
 }

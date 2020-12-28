@@ -22,6 +22,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
 }
 
 dependencies {
@@ -36,6 +45,7 @@ dependencies {
     androidTestImplementation deps.espresso.core
 
     implementation deps.reactivex.rxjava3
+    implementation deps.reactivex.rxandroid
 
     implementation project(':armory')
     implementation project(':httprookie')

@@ -1,17 +1,25 @@
 package com.mitsuki.armory.httprookie
 
+import android.os.Handler
+import android.os.Looper
 import com.mitsuki.armory.httprookie.request.*
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-object HttpRookie : UrlParams,Headers{
+object HttpRookie : UrlParams, Headers {
 
     //公共url参数
     override val urlParams: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
-    //公共header
-    override val headers: LinkedHashMap<String, String> =  LinkedHashMap()
 
-    //TODO：线程调度的问题还没处理
+    //公共header
+    override val headers: LinkedHashMap<String, String> = LinkedHashMap()
+
+    private val mDelivery = Handler(Looper.getMainLooper())
+
+    fun runOnUiThread(run: Runnable) {
+        mDelivery.post(run)
+    }
+
     //TODO：带请求体的还没封装
     //TODO：okhttp通用的一些配置、拦截器之类的还没处理
 
@@ -31,8 +39,5 @@ object HttpRookie : UrlParams,Headers{
 
     fun <T> post(url: String, func: (Request<T>.() -> Unit)? = null): Request<T> =
         PostRequest<T>(url).apply { func?.let { this.it() } }
-
-
-
 
 }
