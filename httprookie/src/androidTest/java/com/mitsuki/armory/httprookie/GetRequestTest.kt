@@ -6,7 +6,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.mitsuki.armory.httprookie.convert.StringConvert
 import com.mitsuki.armory.httprookie.request.urlParams
 import com.mitsuki.armory.httprookie.response.Response
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -63,37 +62,37 @@ class GetRequestTest {
     fun observableTest() {
         val latch = CountDownLatch(3)
         val testStr = Array(3) { "" }
-        HttpRookie.get<String>("https://tcc.taobao.com/cc/json/mobile_tel_segment.htm") {
-            convert = StringConvert()
-            urlParams("tel" to "13858386438")
-        }
-            .enqueueObservable()
-            .subscribeOn(Schedulers.io())
-            .doOnSubscribe {
-                testStr[0] = "onStart"
-                latch.countDown()
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : Observer<Response<String?>> {
-                override fun onComplete() {
-                    testStr[2] = "onFinish"
-                    latch.countDown()
-                }
-
-                override fun onSubscribe(d: Disposable?) {
-                }
-
-                override fun onNext(t: Response<String?>) {
-                    testStr[1] = "${t.body}"
-                    latch.countDown()
-                }
-
-                override fun onError(e: Throwable?) {
-                    testStr[1] = "$e"
-                    latch.countDown()
-                }
-
-            })
+//        HttpRookie.get<String>("https://tcc.taobao.com/cc/json/mobile_tel_segment.htm") {
+//            convert = StringConvert()
+//            urlParams("tel" to "13858386438")
+//        }
+//            .enqueueObservable()
+//            .subscribeOn(Schedulers.io())
+//            .doOnSubscribe {
+//                testStr[0] = "onStart"
+//                latch.countDown()
+//            }
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(object : Observer<Response<String?>> {
+//                override fun onComplete() {
+//                    testStr[2] = "onFinish"
+//                    latch.countDown()
+//                }
+//
+//                override fun onSubscribe(d: Disposable?) {
+//                }
+//
+//                override fun onNext(t: Response<String?>) {
+//                    testStr[1] = "${t.body}"
+//                    latch.countDown()
+//                }
+//
+//                override fun onError(e: Throwable?) {
+//                    testStr[1] = "$e"
+//                    latch.countDown()
+//                }
+//
+//            })
         latch.await()
 
         println(testStr[1])

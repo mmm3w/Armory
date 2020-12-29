@@ -2,6 +2,10 @@ package com.mitsuki.armory.httprookie.request
 
 interface Headers {
     val headers: LinkedHashMap<String, String>
+
+    companion object {
+        const val HEAD_CONTENT_LENGTH = "Content-Length"
+    }
 }
 
 fun Headers.header(header: Pair<String, String>) {

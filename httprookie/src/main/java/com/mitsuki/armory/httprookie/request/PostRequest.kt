@@ -3,9 +3,12 @@ package com.mitsuki.armory.httprookie.request
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import java.io.File
+import java.util.*
+import kotlin.collections.LinkedHashMap
 
 class PostRequest<T>(url: String) : Request<T>(url), HasBody {
     override var type: HasBody.Type = HasBody.Type.NONE
+    override val bodyParams: LinkedList<Pair<String, String>> = LinkedList()
 
     override var mediaType: MediaType? = null
     override lateinit var requestBody: RequestBody
@@ -14,12 +17,12 @@ class PostRequest<T>(url: String) : Request<T>(url), HasBody {
     override lateinit var file: File
 
     override fun generateRequest(): okhttp3.Request {
-        return generateRequestBuilder().tag(tag).post(generateRequestBody()).url(url()).build()
+        val requestBody = generateRequestBody()
+        header(Headers.HEAD_CONTENT_LENGTH to requestBody.contentLength().toString())
+        return generateRequestBuilder().tag(tag).post(requestBody).url(url()).build()
     }
 
     override fun generateRequestBuilder(): okhttp3.Request.Builder {
-        return okhttp3.Request.Builder()
+        return okhttp3.Request.Builder().run { appendHeaders(this) }
     }
-
-
 }

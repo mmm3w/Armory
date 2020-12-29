@@ -10,34 +10,66 @@ object HttpRookie : UrlParams, Headers {
 
     //公共url参数
     override val urlParams: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
+        get() {
+            if (hasNewUrlParams) {
+                field.clear()
+                field.apply(commonUrlParams)
+                hasNewUrlParams = false
+            }
+            return field
+        }
 
     //公共header
     override val headers: LinkedHashMap<String, String> = LinkedHashMap()
+        get() {
+            if (hasNewHeaders) {
+                field.clear()
+                field.apply(commonHeaders)
+                hasNewHeaders = false
+            }
+            return field
+        }
+
+    @Volatile
+    var hasNewUrlParams = true
+
+    @Volatile
+    var hasNewHeaders = true
+
+    private var commonUrlParams: LinkedHashMap<String, MutableList<String>>.() -> Unit = {}
+    private var commonHeaders: LinkedHashMap<String, String>.() -> Unit = {}
 
     private val mDelivery = Handler(Looper.getMainLooper())
-
-    fun runOnUiThread(run: Runnable) {
-        mDelivery.post(run)
-    }
-
-    //TODO：带请求体的还没封装
-    //TODO：okhttp通用的一些配置、拦截器之类的还没处理
 
     val client by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
         OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
-            //TODO：这里的dns解析存在问题，日后需要解决
             .build()
     }
 
 
-    fun <T> get(url: String, func: (Request<T>.() -> Unit)? = null): Request<T> =
+    fun <T> get(url: String, func: (GetRequest<T>.() -> Unit)? = null): GetRequest<T> =
         GetRequest<T>(url).apply { func?.let { this.it() } }
 
-
-    fun <T> post(url: String, func: (Request<T>.() -> Unit)? = null): Request<T> =
+    fun <T> post(url: String, func: (PostRequest<T>.() -> Unit)? = null): PostRequest<T> =
         PostRequest<T>(url).apply { func?.let { this.it() } }
 
+
+    fun runOnUiThread(run: Runnable) {
+        mDelivery.post(run)
+    }
+
+    fun common(
+        commonUrlParams: LinkedHashMap<String, MutableList<String>>.() -> Unit = {},
+        commonHeaders: LinkedHashMap<String, String>.() -> Unit = {}
+    ) {
+        this.commonUrlParams = commonUrlParams
+        this.commonHeaders = commonHeaders
+    }
+
+    fun cancel(tag: Any) {
+        TODO()
+    }
 }
