@@ -3,13 +3,13 @@ package com.mitsuki.armory.httprookie.response
 import okhttp3.Call
 
 sealed class Response<T>(
-    val rawCall: Call,
     val body: T?,
+    val rawCall: Call,
     val rawResponse: okhttp3.Response?
 ) {
 
     class Success<T>(body: T?, rawCall: Call, rawResponse: okhttp3.Response) :
-        Response<T>(rawCall, body, rawResponse) {
+        Response<T>(body, rawCall, rawResponse) {
 
         fun requireBody(): T {
             return body ?: throw IllegalStateException("$this`s content is null")
@@ -21,6 +21,6 @@ sealed class Response<T>(
     }
 
     class Fail<T>(val throwable: Throwable, rawCall: Call, rawResponse: okhttp3.Response?) :
-        Response<T>(rawCall, null, rawResponse)
+        Response<T>(null, rawCall, rawResponse)
 
 }
