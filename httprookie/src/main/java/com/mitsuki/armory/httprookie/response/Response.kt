@@ -12,11 +12,11 @@ sealed class Response<T>(
         Response<T>(body, rawCall, rawResponse) {
 
         fun requireBody(): T {
-            return body ?: throw IllegalStateException("$this`s content is null")
+            return body ?: throw RuntimeException("$this`s content is null")
         }
 
         fun requireRawResponse(): okhttp3.Response {
-            return rawResponse ?: throw IllegalStateException("$this`s rawResponse is null")
+            return rawResponse ?: throw RuntimeException("$this`s rawResponse is null")
         }
     }
 

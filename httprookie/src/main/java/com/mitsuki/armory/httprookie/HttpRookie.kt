@@ -10,34 +10,8 @@ object HttpRookie : UrlParams, Headers {
 
     //公共url参数
     override val urlParams: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
-        get() {
-            if (hasNewUrlParams) {
-                field.clear()
-                field.apply(commonUrlParams)
-                hasNewUrlParams = false
-            }
-            return field
-        }
-
     //公共header
     override val headers: LinkedHashMap<String, String> = LinkedHashMap()
-        get() {
-            if (hasNewHeaders) {
-                field.clear()
-                field.apply(commonHeaders)
-                hasNewHeaders = false
-            }
-            return field
-        }
-
-    @Volatile
-    var hasNewUrlParams = true
-
-    @Volatile
-    var hasNewHeaders = true
-
-    private var commonUrlParams: LinkedHashMap<String, MutableList<String>>.() -> Unit = {}
-    private var commonHeaders: LinkedHashMap<String, String>.() -> Unit = {}
 
     private val mDelivery = Handler(Looper.getMainLooper())
 
@@ -59,14 +33,6 @@ object HttpRookie : UrlParams, Headers {
 
     fun runOnUiThread(run: Runnable) {
         mDelivery.post(run)
-    }
-
-    fun common(
-        commonUrlParams: LinkedHashMap<String, MutableList<String>>.() -> Unit = {},
-        commonHeaders: LinkedHashMap<String, String>.() -> Unit = {}
-    ) {
-        this.commonUrlParams = commonUrlParams
-        this.commonHeaders = commonHeaders
     }
 
     fun cancel(tag: Any) {
