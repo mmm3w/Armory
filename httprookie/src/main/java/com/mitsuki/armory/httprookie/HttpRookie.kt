@@ -3,6 +3,7 @@ package com.mitsuki.armory.httprookie
 import android.os.Handler
 import android.os.Looper
 import com.mitsuki.armory.httprookie.request.*
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
@@ -46,6 +47,13 @@ object HttpRookie : UrlParams, Headers {
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
             .writeTimeout(10, TimeUnit.SECONDS)
+            .addNetworkInterceptor { onRequestAfter(it.proceed(it.request())) }
+            .addInterceptor { it.proceed(onRequestBefore(it, it.request())) }
+            .apply {
+                for (item in mInterceptors) addInterceptor(item)
+                for (item in mNetworkInterceptors) addNetworkInterceptor(item)
+            }
+            .apply(configOkHttp)
             .build()
     }
 
@@ -72,4 +80,24 @@ object HttpRookie : UrlParams, Headers {
     fun cancel(tag: Any) {
         TODO()
     }
+
+
+    /**********************************************************************************************/
+    private val mInterceptors: MutableList<Interceptor> by lazy { ArrayList<Interceptor>() }
+    private val mNetworkInterceptors: MutableList<Interceptor> by lazy { ArrayList<Interceptor>() }
+
+    fun addInterceptor(interceptor: Interceptor) {
+        mInterceptors.add(interceptor)
+    }
+
+    fun addNetworkInterceptor(interceptor: Interceptor) {
+        mNetworkInterceptors.add(interceptor)
+    }
+
+    var configOkHttp: OkHttpClient.Builder.() -> Unit = {}
+
+    var onRequestBefore: (chain: Interceptor.Chain, request: okhttp3.Request) -> okhttp3.Request =
+        { _, request -> request }
+
+    var onRequestAfter: (response: okhttp3.Response) -> okhttp3.Response = { it }
 }
