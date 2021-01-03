@@ -6,7 +6,7 @@ import java.io.File
 import java.util.*
 import kotlin.collections.LinkedHashMap
 
-class PostRequest<T>(url: String) : Request<T>(url), HasBody {
+class PostRequest<T : Any>(url: String) : Request<T>(url), HasBody {
     override var type: HasBody.Type = HasBody.Type.NONE
     override val bodyParams: LinkedList<Pair<String, String>> = LinkedList()
 

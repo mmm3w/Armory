@@ -11,6 +11,7 @@ object HttpRookie : UrlParams, Headers {
 
     //公共url参数
     override val urlParams: LinkedHashMap<String, MutableList<String>> = LinkedHashMap()
+
     //公共header
     override val headers: LinkedHashMap<String, String> = LinkedHashMap()
 
@@ -32,10 +33,10 @@ object HttpRookie : UrlParams, Headers {
     }
 
 
-    fun <T> get(url: String, func: (GetRequest<T>.() -> Unit)? = null): GetRequest<T> =
+    fun <T : Any> get(url: String, func: (GetRequest<T>.() -> Unit)? = null): GetRequest<T> =
         GetRequest<T>(url).apply { func?.let { this.it() } }
 
-    fun <T> post(url: String, func: (PostRequest<T>.() -> Unit)? = null): PostRequest<T> =
+    fun <T : Any> post(url: String, func: (PostRequest<T>.() -> Unit)? = null): PostRequest<T> =
         PostRequest<T>(url).apply { func?.let { this.it() } }
 
 

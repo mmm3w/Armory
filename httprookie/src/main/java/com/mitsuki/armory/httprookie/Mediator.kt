@@ -6,7 +6,7 @@ import com.mitsuki.armory.httprookie.response.Response
 import okhttp3.Call
 
 
-class Mediator<T>(private val mRequest: Request<T>) : Cloneable {
+class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     private var mCallback: Callback<T>? = null
     private lateinit var mRawCall: Call
@@ -52,7 +52,7 @@ class Mediator<T>(private val mRequest: Request<T>) : Cloneable {
         }
     }
 
-    fun execute(): Response<T?> {
+    fun execute(): Response<T> {
         try {
             val response: okhttp3.Response = prepareRawCall().execute()
             val code = response.code
@@ -80,12 +80,12 @@ class Mediator<T>(private val mRequest: Request<T>) : Cloneable {
         synchronized(this) { return this::mRawCall.isInitialized && mRawCall.isCanceled() }
     }
 
-    private inline fun error(func: () -> Response.Fail<T?>) {
+    private inline fun error(func: () -> Response.Fail<T>) {
         mCallback?.onError(func())
         mCallback?.onFinish()
     }
 
-    private inline fun success(func: () -> Response.Success<T?>) {
+    private inline fun success(func: () -> Response.Success<T>) {
         mCallback?.onSuccess(func())
         mCallback?.onFinish()
     }

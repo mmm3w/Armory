@@ -11,19 +11,19 @@ import io.reactivex.rxjava3.exceptions.CompositeException
 import io.reactivex.rxjava3.exceptions.Exceptions
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 
-internal class EnqueueObservable<T>(private val mMediator: Mediator<T>) :
-    Observable<Response<T?>>() {
+internal class EnqueueObservable<T : Any>(private val mMediator: Mediator<T>) :
+    Observable<Response<T>>() {
 
-    override fun subscribeActual(observer: Observer<in Response<T?>>?) {
+    override fun subscribeActual(observer: Observer<in Response<T>>?) {
         val mediator = mMediator.clone()
         val callback = CallbackDisposable(mediator, observer)
         observer?.onSubscribe(callback)
         mediator.execute(callback)
     }
 
-    private class CallbackDisposable<T>(
+    private class CallbackDisposable<T : Any>(
         private val mMediator: Mediator<in T>,
-        private val mObserver: Observer<in Response<T?>>?
+        private val mObserver: Observer<in Response<T>>?
     ) :
         Disposable, Callback<T> {
 
@@ -40,7 +40,7 @@ internal class EnqueueObservable<T>(private val mMediator: Mediator<T>) :
         override fun onStart() {
         }
 
-        override fun onSuccess(response: Response.Success<T?>) {
+        override fun onSuccess(response: Response.Success<T>) {
             if (mMediator.isCanceled()) return
             try {
                 mObserver?.onNext(response)
@@ -53,12 +53,17 @@ internal class EnqueueObservable<T>(private val mMediator: Mediator<T>) :
             }
         }
 
-        override fun onError(response: Response.Fail<T?>) {
+        override fun onError(response: Response.Fail<T>) {
             if (mMediator.isCanceled()) return
 
             try {
                 mIsTerminated = true
-                mObserver?.onError(ResponseThrowable(response.hashCode(), cause = response.throwable))
+                mObserver?.onError(
+                    ResponseThrowable(
+                        response.hashCode(),
+                        cause = response.throwable
+                    )
+                )
             } catch (inner: Throwable) {
                 Exceptions.throwIfFatal(inner)
                 RxJavaPlugins.onError(

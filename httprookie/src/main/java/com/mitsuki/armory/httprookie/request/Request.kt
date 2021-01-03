@@ -13,7 +13,7 @@ import okhttp3.Call
 import okhttp3.Request
 
 @Suppress("MemberVisibilityCanBePrivate")
-abstract class Request<T>(val rawUrl: String) : UrlParams, Headers {
+abstract class Request<T : Any>(val rawUrl: String) : UrlParams, Headers {
     val mHttpRookie: HttpRookie = HttpRookie
 
     lateinit var mMediator: Mediator<T>
@@ -35,8 +35,8 @@ abstract class Request<T>(val rawUrl: String) : UrlParams, Headers {
 
     fun callback(
         onStart: (() -> Unit)? = null,
-        onSuccess: ((response: Response.Success<T?>) -> Unit)? = null,
-        onError: ((response: Response.Fail<T?>) -> Unit)? = null,
+        onSuccess: ((response: Response.Success<T>) -> Unit)? = null,
+        onError: ((response: Response.Fail<T>) -> Unit)? = null,
         onFinish: (() -> Unit)? = null
     ) {
         this.callback = DefaultCallback(onStart, onSuccess, onError, onFinish)
@@ -72,15 +72,15 @@ abstract class Request<T>(val rawUrl: String) : UrlParams, Headers {
     }
 
     //同步调用
-    fun execute(): Response<T?> {
+    fun execute(): Response<T> {
         return mediator().execute()
     }
 
-    fun enqueueObservable(): Observable<Response<T?>> {
+    fun enqueueObservable(): Observable<Response<T>> {
         return ObservableFactory.obtain(mediator())
     }
 
-    fun executeObservable(): Observable<Response<T?>> {
+    fun executeObservable(): Observable<Response<T>> {
         return ObservableFactory.obtain(mediator(), isAsync = false)
     }
 }

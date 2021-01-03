@@ -1,7 +1,7 @@
 package com.mitsuki.armory.httprookie.request
 
 
-class GetRequest<T>(url: String) : Request<T>(url) {
+class GetRequest<T : Any>(url: String) : Request<T>(url) {
     override fun generateRequest(): okhttp3.Request {
         return generateRequestBuilder().tag(tag).get().url(url()).build()
     }

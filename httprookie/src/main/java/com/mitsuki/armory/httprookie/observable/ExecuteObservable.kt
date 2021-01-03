@@ -9,15 +9,15 @@ import io.reactivex.rxjava3.exceptions.CompositeException
 import io.reactivex.rxjava3.exceptions.Exceptions
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 
-internal class ExecuteObservable<T>(private val mMediator: Mediator<T>) :
-    Observable<Response<T?>>() {
+internal class ExecuteObservable<T : Any>(private val mMediator: Mediator<T>) :
+    Observable<Response<T>>() {
 
-    override fun subscribeActual(observer: Observer<in Response<T?>>?) {
+    override fun subscribeActual(observer: Observer<in Response<T>>?) {
         val mediator = mMediator.clone()
         observer?.onSubscribe(CallDisposable(mediator))
         var terminated = false
         try {
-            val response: Response<T?> = mediator.execute()
+            val response: Response<T> = mediator.execute()
             if (!mediator.isCanceled()) {
                 observer?.onNext(response)
             }
@@ -41,7 +41,7 @@ internal class ExecuteObservable<T>(private val mMediator: Mediator<T>) :
     }
 
 
-    private class CallDisposable<T>(private val mMediator: Mediator<T>) : Disposable {
+    private class CallDisposable<T : Any>(private val mMediator: Mediator<T>) : Disposable {
         override fun isDisposed(): Boolean {
             return mMediator.isCanceled()
         }
