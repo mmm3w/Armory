@@ -44,7 +44,7 @@ internal class EnqueueObservable<T : Any>(private val mMediator: Mediator<T>) :
             if (mMediator.isCanceled()) return
             try {
                 mObserver?.onNext(response)
-            } catch (e: Exception) {
+            } catch (e: Throwable) {
                 if (mIsTerminated) {
                     RxJavaPlugins.onError(e)
                 } else {

@@ -44,7 +44,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
                         mRequest.convert.convertResponse(response).apply {
                             success { Response.Success(this, call, response) }
                         }
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
                         error { Response.Fail(e, call, response) }
                     }
                 }
@@ -59,7 +59,6 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
             if (code == 404 || code >= 500) {
                 return Response.Fail(RuntimeException("404 or 50x"), mRawCall, response)
             }
-
             return mRequest.convert.convertResponse(response).run {
                 Response.Success(this, mRawCall, response)
             }
@@ -77,7 +76,9 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     fun isCanceled(): Boolean {
         if (isCanceled) return true
-        synchronized(this) { return this::mRawCall.isInitialized && mRawCall.isCanceled() }
+        synchronized(this) {
+            return if (this::mRawCall.isInitialized) mRawCall.isCanceled() else false
+        }
     }
 
     private inline fun error(func: () -> Response.Fail<T>) {
