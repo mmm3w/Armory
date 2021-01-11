@@ -10,11 +10,11 @@ fun Call.enqueueBy(
 ) {
     enqueue(object : okhttp3.Callback {
         override fun onResponse(call: Call, response: Response) {
-            onResponse?.invoke(call, response)
+            HttpRookie.runOnUiThread(Runnable { onResponse?.invoke(call, response) })
         }
 
         override fun onFailure(call: Call, e: IOException) {
-            onFailure?.invoke(call, e)
+            HttpRookie.runOnUiThread(Runnable { onFailure?.invoke(call, e) })
         }
     })
 }
