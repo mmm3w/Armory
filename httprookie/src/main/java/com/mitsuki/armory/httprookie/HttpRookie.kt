@@ -39,6 +39,12 @@ object HttpRookie : UrlParams, Headers {
     fun <T : Any> post(url: String, func: (PostRequest<T>.() -> Unit)? = null): PostRequest<T> =
         PostRequest<T>(url).apply { func?.let { this.it() } }
 
+    fun <T : Any> put(url: String, func: (PutRequest<T>.() -> Unit)? = null): PutRequest<T> =
+        PutRequest<T>(url).apply { func?.let { this.it() } }
+
+    fun <T : Any> delete(url: String, func: (DeleteRequest<T>.() -> Unit)? = null): DeleteRequest<T> =
+        DeleteRequest<T>(url).apply { func?.let { this.it() } }
+
 
     fun runOnUiThread(run: Runnable) {
         mDelivery.post(run)
@@ -47,7 +53,6 @@ object HttpRookie : UrlParams, Headers {
     fun cancel(tag: Any) {
         TODO()
     }
-
 
     /**********************************************************************************************/
     private val mInterceptors: MutableList<Interceptor> by lazy { ArrayList<Interceptor>() }
