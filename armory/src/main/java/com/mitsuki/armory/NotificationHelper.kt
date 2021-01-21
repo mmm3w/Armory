@@ -43,11 +43,12 @@ object NotificationHelper {
     fun notify(
         channelID: String,
         notifyID: Int = -1,
-        func: NotificationCompat.Builder.() -> Unit
+        func: (Context, NotificationCompat.Builder) -> Unit
     ): Int {
         return builder(channelID)?.run {
             val nid = if (notifyID < 0) System.currentTimeMillis().toInt() else notifyID
-            notificationManagerInstance().notify(nid, apply(func).build())
+            func(this@NotificationHelper.mContext, this)
+            notificationManagerInstance().notify(nid, build())
             nid
         } ?: -1
     }
