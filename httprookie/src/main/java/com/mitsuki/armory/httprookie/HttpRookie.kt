@@ -42,7 +42,10 @@ object HttpRookie : UrlParams, Headers {
     fun <T : Any> put(url: String, func: (PutRequest<T>.() -> Unit)? = null): PutRequest<T> =
         PutRequest<T>(url).apply { func?.let { this.it() } }
 
-    fun <T : Any> delete(url: String, func: (DeleteRequest<T>.() -> Unit)? = null): DeleteRequest<T> =
+    fun <T : Any> delete(
+        url: String,
+        func: (DeleteRequest<T>.() -> Unit)? = null
+    ): DeleteRequest<T> =
         DeleteRequest<T>(url).apply { func?.let { this.it() } }
 
 
@@ -51,7 +54,25 @@ object HttpRookie : UrlParams, Headers {
     }
 
     fun cancel(tag: Any) {
-        TODO()
+        for (call in client.dispatcher.queuedCalls()) {
+            if (tag == call.request().tag()) {
+                call.cancel()
+            }
+        }
+        for (call in client.dispatcher.runningCalls()) {
+            if (tag == call.request().tag()) {
+                call.cancel()
+            }
+        }
+    }
+
+    fun cancelAll() {
+        for (call in client.dispatcher.queuedCalls()) {
+            call.cancel()
+        }
+        for (call in client.dispatcher.runningCalls()) {
+            call.cancel()
+        }
     }
 
     /**********************************************************************************************/

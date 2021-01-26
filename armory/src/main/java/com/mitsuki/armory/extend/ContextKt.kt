@@ -34,6 +34,12 @@ fun Activity.hideSoftInput() =
             .hideSoftInputFromWindow(it.windowToken, 0)
     } ?: false
 
+fun Fragment.showSoftInput() = requireActivity().showSoftInput()
+
+fun Fragment.hideSoftInput() = requireActivity().hideSoftInput()
+
+/**************************************************************************************************/
+
 @ColorInt
 @SuppressLint("Recycle")
 fun Context.themeColor(

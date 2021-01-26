@@ -37,7 +37,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
                 onResponse = { call, response ->
                     val code = response.code
                     if (code == 404 || code >= 500) {
-                        error { Response.Fail(RuntimeException("404 or 50x"), call, response) }
+                        error { Response.Fail(Throwable("404 or 50x"), call, response) }
                         return@enqueueBy
                     }
                     try {
@@ -57,7 +57,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
             val response: okhttp3.Response = prepareRawCall().execute()
             val code = response.code
             if (code == 404 || code >= 500) {
-                return Response.Fail(RuntimeException("404 or 50x"), mRawCall, response)
+                return Response.Fail(Throwable("404 or 50x"), mRawCall, response)
             }
             return mRequest.convert.convertResponse(response).run {
                 Response.Success(this, mRawCall, response)
