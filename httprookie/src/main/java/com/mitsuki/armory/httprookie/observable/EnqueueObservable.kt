@@ -3,7 +3,6 @@ package com.mitsuki.armory.httprookie.observable
 import com.mitsuki.armory.httprookie.Mediator
 import com.mitsuki.armory.httprookie.callback.Callback
 import com.mitsuki.armory.httprookie.response.Response
-import com.mitsuki.armory.httprookie.response.MetaThrowable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Observer
 import io.reactivex.rxjava3.disposables.Disposable
@@ -58,12 +57,10 @@ internal class EnqueueObservable<T : Any>(private val mMediator: Mediator<T>) :
 
             try {
                 mIsTerminated = true
-                mObserver?.onError(MetaThrowable(response, response.throwable))
+                mObserver?.onError(response.throwable)
             } catch (inner: Throwable) {
                 Exceptions.throwIfFatal(inner)
-                RxJavaPlugins.onError(
-                    MetaThrowable(response, CompositeException(response.throwable, inner))
-                )
+                RxJavaPlugins.onError(CompositeException(response.throwable, inner))
             }
         }
 
