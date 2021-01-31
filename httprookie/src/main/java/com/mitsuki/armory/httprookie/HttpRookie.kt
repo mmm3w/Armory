@@ -15,7 +15,6 @@ object HttpRookie : UrlParams, Headers {
     //公共header
     override val headers: LinkedHashMap<String, String> = LinkedHashMap()
 
-    private val mDelivery = Handler(Looper.getMainLooper())
 
     val client by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
         OkHttpClient.Builder()
@@ -47,11 +46,6 @@ object HttpRookie : UrlParams, Headers {
         func: (DeleteRequest<T>.() -> Unit)? = null
     ): DeleteRequest<T> =
         DeleteRequest<T>(url).apply { func?.let { this.it() } }
-
-
-    fun runOnUiThread(run: Runnable) {
-        mDelivery.post(run)
-    }
 
     fun cancel(tag: Any) {
         for (call in client.dispatcher.queuedCalls()) {

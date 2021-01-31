@@ -25,7 +25,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
     }
 
     private fun runOnUiThread(func: () -> Unit) {
-        HttpRookie.runOnUiThread(Runnable { func() })
+        UiThreadProvider.runOnUiThread(func)
     }
 
     fun execute(cb: Callback<T>) {

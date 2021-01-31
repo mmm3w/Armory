@@ -1,11 +1,12 @@
 package com.mitsuki.armorydemo
 
 import android.app.Application
-import com.mitsuki.armorydemo.systemalert.AlertManager
+import com.mitsuki.systemoverlay.OverlayManager
 
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        AlertManager.init(this)
+        OverlayManager.init(this)
     }
+
 }

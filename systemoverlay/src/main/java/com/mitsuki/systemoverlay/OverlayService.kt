@@ -1,10 +1,9 @@
-package com.mitsuki.armorydemo.systemalert
+package com.mitsuki.systemoverlay
 
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 
-class AlertService : Service() {
-    
+class OverlayService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 }
