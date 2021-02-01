@@ -2,8 +2,8 @@ package com.mitsuki.systemoverlay
 
 import android.content.Context
 import android.graphics.Point
-import android.os.Build
 import android.view.WindowManager
+import androidx.core.view.isVisible
 import java.lang.ref.WeakReference
 
 
@@ -16,25 +16,29 @@ object OverlayManager {
 
     private var mCurrentOverlay: WeakReference<OverlayView>? = null
 
-    private val mOverlayMap: MutableMap<Int, WeakReference<OverlayView>> by lazy { hashMapOf() }
+    private val mOverlayMap: MutableMap<Int, WeakReference<OverlayView>> by lazy { hashMapOf<Int, WeakReference<OverlayView>>() }
 
     fun init(context: Context) {
         mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            with(mWindowManager.currentWindowMetrics.bounds) {
-                screenHeight = width()
-                screenHeight = height()
-            }
-        } else {
-            Point().apply {
-                @Suppress("DEPRECATION")
-                mWindowManager.defaultDisplay.getSize(this)
-                screenWidth = x
-                screenHeight = y
-            }
-
+        Point().apply {
+            mWindowManager.defaultDisplay.getSize(this)
+            screenWidth = x
+            screenHeight = y
         }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            with(mWindowManager.currentWindowMetrics.bounds) {
+//                screenHeight = width()
+//                screenHeight = height()
+//            }
+//        } else {
+//            Point().apply {
+//                @Suppress("DEPRECATION")
+//                mWindowManager.defaultDisplay.getSize(this)
+//                screenWidth = x
+//                screenHeight = y
+//            }
+//
+//        }
     }
 
     fun switch(overlayView: OverlayView) {
@@ -60,9 +64,11 @@ object OverlayManager {
         with(overlayView) {
             if (!isAdded) {
                 isAdded = try {
-                    view().layoutParams = layoutParams()
-                    mWindowManager.addView(view(), layoutParams())
-
+                    with(view()) {
+                        layoutParams = layoutParams()
+                        isVisible = false
+                        mWindowManager.addView(this, layoutParams())
+                    }
                     if (mOverlayMap[overlayView.hashCode()]?.get() == null) {
                         mOverlayMap[overlayView.hashCode()] = WeakReference(overlayView)
                     }

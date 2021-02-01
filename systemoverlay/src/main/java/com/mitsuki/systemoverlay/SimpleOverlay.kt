@@ -4,22 +4,19 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PixelFormat
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
+import androidx.core.animation.addListener
+import androidx.core.view.isVisible
 
 class SimpleOverlay @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), OverlayView {
-
-    init {
-        alpha = 0f
-        scaleX = 0f
-        scaleY = 0f
-    }
 
     override var isAdded: Boolean = false
 
@@ -34,7 +31,9 @@ class SimpleOverlay @JvmOverloads constructor(
             width = WindowManager.LayoutParams.MATCH_PARENT
             height = WindowManager.LayoutParams.WRAP_CONTENT
             flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                    WindowManager.LayoutParams.FLAG_DIM_BEHIND
+            dimAmount = 0.5f
             x = 0
             y = 0
         }
@@ -45,21 +44,19 @@ class SimpleOverlay @JvmOverloads constructor(
     override fun layoutParams(): WindowManager.LayoutParams = mLayoutParams
 
     override fun appear() {
+        isVisible = true
+        update()
         post {
             if (!mAppearAnimation.isAnimationRunning()) {
-                mAppearAnimation = ValueAnimator.ofFloat(alpha, 1f).apply {
+                translationY = -height.toFloat()
+                mAppearAnimation = ValueAnimator.ofFloat(translationY, 0f).apply {
                     duration = 300
                     addUpdateListener {
-                        with(it.animatedValue as Float) {
-                            alpha = this
-                            scaleY = this
-                            scaleX = this
-                        }
+                        translationY = it.animatedValue as Float
                         update()
                     }
                     start()
                 }
-
                 if (mDisappearAnimation.isAnimationRunning())
                     mDisappearAnimation?.cancel()
             }
@@ -68,16 +65,16 @@ class SimpleOverlay @JvmOverloads constructor(
 
     override fun disappear() {
         if (!mDisappearAnimation.isAnimationRunning()) {
-            mDisappearAnimation = ValueAnimator.ofFloat(alpha, 0f).apply {
+            mDisappearAnimation = ValueAnimator.ofFloat(translationY, (-height).toFloat()).apply {
                 duration = 300
                 addUpdateListener {
-                    with(it.animatedValue as Float) {
-                        alpha = this
-                        scaleY = this
-                        scaleX = this
-                    }
+                    translationY = it.animatedValue as Float
                     update()
                 }
+                addListener(onEnd = {
+                    isVisible = false
+                    update()
+                })
                 start()
             }
 

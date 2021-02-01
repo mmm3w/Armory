@@ -9,9 +9,10 @@ import android.view.*
 import android.widget.FrameLayout
 import androidx.annotation.LayoutRes
 import androidx.core.animation.addListener
+import androidx.core.view.isVisible
 
 class SideOverlay @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr), OverlayView {
 
     init {
@@ -100,8 +101,8 @@ class SideOverlay @JvmOverloads constructor(
     private fun closeToSide() {
         if (mMoveToSideAnimation.isAnimationRunning()) mMoveToSideAnimation?.cancel()
         mMoveToSideAnimation = ValueAnimator.ofInt(
-            lastPositionX,
-            if (lastPositionX > OverlayManager.screenWidth / 2) maxX else 0
+                lastPositionX,
+                if (lastPositionX > OverlayManager.screenWidth / 2) maxX else 0
         ).apply {
             duration = 400
             addUpdateListener {
@@ -122,6 +123,8 @@ class SideOverlay @JvmOverloads constructor(
     override fun layoutParams(): WindowManager.LayoutParams = mLayoutParams
 
     override fun appear() {
+        isVisible = true
+        update()
         post {
             if (!mAppearAnimation.isAnimationRunning()) {
                 mAppearAnimation = ValueAnimator.ofFloat(alpha, 1f).apply {
@@ -155,6 +158,10 @@ class SideOverlay @JvmOverloads constructor(
                     }
                     update()
                 }
+                addListener(onEnd = {
+                    isVisible = false
+                    update()
+                })
                 start()
             }
 
