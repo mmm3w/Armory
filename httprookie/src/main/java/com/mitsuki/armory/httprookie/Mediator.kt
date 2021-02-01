@@ -4,6 +4,7 @@ import com.mitsuki.armory.httprookie.callback.Callback
 import com.mitsuki.armory.httprookie.request.Request
 import com.mitsuki.armory.httprookie.response.Response
 import okhttp3.Call
+import java.io.IOException
 
 
 class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
@@ -30,26 +31,34 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     fun execute(cb: Callback<T>) {
         this.mCallback = cb
-        runOnUiThread {
-            this.mCallback?.onStart()
-            prepareRawCall().enqueueBy(
-                onFailure = { call, e -> error { Response.Fail(e, call, null) } },
-                onResponse = { call, response ->
-                    val code = response.code
-                    if (code == 404 || code >= 500) {
+        runOnUiThread { this.mCallback?.onStart() }
+        prepareRawCall().enqueue(object : okhttp3.Callback {
+            override fun onResponse(call: Call, response: okhttp3.Response) {
+                val code = response.code
+                if (code == 404 || code >= 500) {
+                    runOnUiThread {
                         error { Response.Fail(Throwable("404 or 50x"), call, response) }
-                        return@enqueueBy
                     }
-                    try {
-                        mRequest.convert.convertResponse(response).apply {
+                    return
+                }
+                try {
+                    mRequest.convert.convertResponse(response).apply {
+                        runOnUiThread {
                             success { Response.Success(this, call, response) }
                         }
-                    } catch (e: Throwable) {
+                    }
+                } catch (e: Throwable) {
+                    runOnUiThread {
                         error { Response.Fail(e, call, response) }
                     }
                 }
-            )
-        }
+
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread { error { Response.Fail(e, call, null) } }
+            }
+        })
     }
 
     fun execute(): Response<T> {

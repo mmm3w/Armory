@@ -1,24 +1,16 @@
 package com.mitsuki.armorydemo
 
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.mitsuki.armory.httprookie.HttpRookie
+import com.mitsuki.armory.httprookie.convert.FileConvert
 import com.mitsuki.armorydemo.databinding.ActivityMainBinding
-import com.mitsuki.systemoverlay.overlayPermission
-import com.mitsuki.systemoverlay.OverlayManager
-import com.mitsuki.systemoverlay.SideOverlay
-import com.mitsuki.systemoverlay.SimpleOverlay
+import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
-
-    private val testView by lazy {
-        SideOverlay(applicationContext).apply { layout(R.layout.view_test) }
-    }
-
-    private val controlView by lazy {
-        SimpleOverlay(applicationContext).apply { layout(R.layout.view_control) }
-    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -26,22 +18,27 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(root) }
 
-        overlayPermission {
-            it?.apply { startActivity(this) }
-        }
+        binding.mainText.text = path()
+//        HttpRookie.get<>()
+//
+//        HttpRookie.get<File>("https://stream7.iqilu.com/10339/upload_transcode/202002/18/20200218114723HDu3hhxqIT.mp4") {
+//            convert = FileConvert(cacheDir.path, "test.mp4")
+//            callback(onFinish = {
+//                Log.e("asdf", "finish")
+//            },
+//                onError = {
+//                    Log.e("asdf", "${it.throwable}")
+//                },
+//                onSuccess = {
+//
+//                })
+//        }.enqueue()
+    }
 
-        testView.setOnClickListener {
-            OverlayManager.switch(controlView)
-        }
 
-        binding.btnAdd.setOnClickListener {
-            OverlayManager.switch(testView)
-        }
-
-        binding.btnRemove.setOnClickListener {
-            OverlayManager.exit()
-        }
-
+    private fun path(): String {
+        return "cacheDir:$cacheDir\n" + //  /data/data/包名/cache 内部缓存路径，内存不够时候会被优先删除
+                "filesDir$filesDir"  //  /data/data/包名/files 跟随应用的内部存储
     }
 
 }
