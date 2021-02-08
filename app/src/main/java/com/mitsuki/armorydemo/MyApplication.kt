@@ -6,7 +6,6 @@ import com.mitsuki.systemoverlay.OverlayManager
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        OverlayManager.init(this)
     }
 
 }
