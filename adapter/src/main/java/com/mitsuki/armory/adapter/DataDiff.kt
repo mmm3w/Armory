@@ -12,11 +12,18 @@ class DataDiff<T>(
 
     override fun getNewListSize(): Int = newList.size
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-        diff.areItemsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val oldItem = oldList[oldItemPosition] ?: return newList[newItemPosition] == null
+        val newItem = newList[newItemPosition] ?: return false
+        return diff.areItemsTheSame(oldItem, newItem)
+    }
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-        diff.areContentsTheSame(oldList[oldItemPosition], newList[newItemPosition])
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        val oldItem = oldList[oldItemPosition] ?: return newList[newItemPosition] == null
+        val newItem = newList[newItemPosition] ?: return false
+        return diff.areContentsTheSame(oldItem, newItem)
+
+    }
 }
 
 inline fun <reified T> calculateDiff(
