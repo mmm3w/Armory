@@ -2,13 +2,13 @@ package com.mitsuki.armory.adapter.empty
 
 sealed class EmptyState(val isEmpty: Boolean) {
 
-    class Normal(isEmpty: Boolean) : EmptyState(isEmpty) {
+    class Normal(isEmpty: Boolean, val hint: String = "") : EmptyState(isEmpty) {
         override fun equals(other: Any?): Boolean {
-            return other is Normal && isEmpty == other.isEmpty
+            return other is Normal && isEmpty == other.isEmpty && hint == other.hint
         }
 
         override fun hashCode(): Int {
-            return isEmpty.hashCode()
+            return isEmpty.hashCode() + hint.hashCode()
         }
     }
 
