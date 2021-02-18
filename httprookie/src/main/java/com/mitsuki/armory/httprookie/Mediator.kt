@@ -10,18 +10,18 @@ import java.io.IOException
 class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     private var mCallback: Callback<T>? = null
-    private lateinit var mRawCall: Call
+    private var mRawCall: Call? = null
 
     @Volatile
     private var isCanceled = false
     private var isExecuted = false
 
     @Synchronized
-    private fun prepareRawCall(): Call {
+    private fun prepareRawCall(): Call? {
         if (isExecuted) throw java.lang.RuntimeException("")
         isExecuted = true
         mRawCall = mRequest.generateCall()
-        if (isCanceled) mRawCall.cancel()
+        if (isCanceled) mRawCall?.cancel()
         return mRawCall
     }
 
@@ -32,7 +32,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
     fun execute(cb: Callback<T>) {
         this.mCallback = cb
         runOnUiThread { this.mCallback?.onStart() }
-        prepareRawCall().enqueue(object : okhttp3.Callback {
+        prepareRawCall()?.enqueue(object : okhttp3.Callback {
             override fun onResponse(call: Call, response: okhttp3.Response) {
                 val code = response.code
                 if (code == 404 || code >= 500) {
@@ -63,7 +63,7 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     fun execute(): Response<T> {
         try {
-            val response: okhttp3.Response = prepareRawCall().execute()
+            val response: okhttp3.Response = prepareRawCall()?.execute() ?: throw Throwable("Null response")
             val code = response.code
             if (code == 404 || code >= 500) {
                 return Response.Fail(Throwable("404 or 50x"), mRawCall, response)
@@ -78,15 +78,13 @@ class Mediator<T : Any>(private val mRequest: Request<T>) : Cloneable {
 
     fun cancel() {
         isCanceled = true
-        if (this::mRawCall.isInitialized) {
-            mRawCall.cancel()
-        }
+        mRawCall?.cancel()
     }
 
     fun isCanceled(): Boolean {
         if (isCanceled) return true
         synchronized(this) {
-            return if (this::mRawCall.isInitialized) mRawCall.isCanceled() else false
+            return mRawCall?.isCanceled() ?: false
         }
     }
 
