@@ -16,6 +16,7 @@ import android.view.animation.Transformation
 import android.widget.ImageView
 import android.widget.OverScroller
 import androidx.core.view.ViewCompat
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -30,6 +31,8 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
             initBase()
         }
 
+    var parentScrollOrientation: Orientation = Orientation.HORIZONTAL
+
     private val mDrawMatrix = Matrix()
     private val mBaseMatrix = Matrix()
     private val mDecoMatrix = Matrix()
@@ -41,6 +44,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
 
     //启用mSlideType阈值，除非超过阈值，否则都为NONE mode
     private var mScaleThreshold = 0.0f
+
 
     private val mCurrentFlingRunnable = FlingAnimation()
     private val mScaleGestureDetector = ScaleGestureDetector(mImageView.context, this)
@@ -97,22 +101,40 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
         val viewWidth = mImageView.width
         val viewHeight = mImageView.height
         finalMatrix.getDisplayRect()
+        mImageView.parent?.requestDisallowInterceptTouchEvent(true)
         if (distanceX > 0) {
-            if (mDisplayRect.right > viewWidth) handled = true
+            if (mDisplayRect.right > viewWidth) {
+                handled = true
+            } else {
+                if (parentScrollOrientation == Orientation.HORIZONTAL)
+                    mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         } else {
-            if (mDisplayRect.left < 0f) handled = true
+            if (mDisplayRect.left < 0f) {
+                handled = true
+            } else {
+                if (parentScrollOrientation == Orientation.HORIZONTAL)
+                    mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         }
         if (distanceY > 0) {
-            if (mDisplayRect.bottom > viewHeight) handled = true
+            if (mDisplayRect.bottom > viewHeight) {
+                handled = true
+            } else {
+                if (parentScrollOrientation == Orientation.VERTICAL)
+                    mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         } else {
-            if (mDisplayRect.top < 0f) handled = true
+            if (mDisplayRect.top < 0f) {
+                handled = true
+            } else {
+                if (parentScrollOrientation == Orientation.VERTICAL)
+                    mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         }
         if (handled) {
-            mImageView.parent?.requestDisallowInterceptTouchEvent(true)
             mDecoMatrix.postTranslate(-distanceX, -distanceY)
             updateImageMatrix()
-        } else {
-            mImageView.parent?.requestDisallowInterceptTouchEvent(false)
         }
         return handled
     }
