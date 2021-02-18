@@ -1,5 +1,6 @@
 package com.mitsuki.armory.span
 
+import android.graphics.Typeface
 import android.text.style.*
 import android.view.View
 import androidx.annotation.ColorInt
@@ -14,6 +15,8 @@ class StylefulText(val text: String, action: StylefulText.() -> Unit) {
         const val STRIKETHROUGH = "STRIKETHROUGH"
         const val TEXT_SIZE = "TEXT_SIZE"
         const val TEXT_CLICKABLE = "TEXT_CLICKABLE"
+        const val ITALIC = "ITALIC"
+        const val BOLD = "BOLD"
     }
 
     val length: Int
@@ -36,8 +39,17 @@ class StylefulText(val text: String, action: StylefulText.() -> Unit) {
         mStyleMap[BACKGROUND_COLOR] = BackgroundColorSpan(color)
     }
 
+    @Deprecated("extend to 2 funtion", ReplaceWith("absoluteSize(px)"))
     fun size(px: Int) {
+        absoluteSize(px)
+    }
+
+    fun absoluteSize(px: Int) {
         mStyleMap[TEXT_SIZE] = AbsoluteSizeSpan(px)
+    }
+
+    fun relativeSize(proportion: Float) {
+        mStyleMap[TEXT_SIZE] = RelativeSizeSpan(proportion)
     }
 
     fun click(action: (View) -> Unit) {
@@ -54,6 +66,14 @@ class StylefulText(val text: String, action: StylefulText.() -> Unit) {
 
     fun strikethrough() {
         mStyleMap[STRIKETHROUGH] = StrikethroughSpan()
+    }
+
+    fun italic() {
+        mStyleMap[ITALIC] = StyleSpan(Typeface.ITALIC)
+    }
+
+    fun bold() {
+        mStyleMap[BOLD] = StyleSpan(Typeface.BOLD)
     }
 
     fun forEach(action: (Map.Entry<String, CharacterStyle>) -> Unit) {
