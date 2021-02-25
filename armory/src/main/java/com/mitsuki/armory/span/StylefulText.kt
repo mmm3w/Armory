@@ -17,6 +17,7 @@ class StylefulText(val text: String, action: StylefulText.() -> Unit) {
         const val TEXT_CLICKABLE = "TEXT_CLICKABLE"
         const val ITALIC = "ITALIC"
         const val BOLD = "BOLD"
+        const val CUSTOM = "CUSTOM"
     }
 
     val length: Int
@@ -74,6 +75,10 @@ class StylefulText(val text: String, action: StylefulText.() -> Unit) {
 
     fun bold() {
         mStyleMap[BOLD] = StyleSpan(Typeface.BOLD)
+    }
+
+    fun custom(tag: String, provider: () -> CharacterStyle) {
+        mStyleMap["$CUSTOM$tag"] = provider()
     }
 
     fun forEach(action: (Map.Entry<String, CharacterStyle>) -> Unit) {
