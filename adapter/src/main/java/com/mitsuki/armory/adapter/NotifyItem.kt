@@ -6,40 +6,39 @@ import androidx.recyclerview.widget.RecyclerView
 sealed class NotifyItem {
     abstract fun dispatch(adapter: RecyclerView.Adapter<*>)
 
-    //填充新数据
-    class NewData(private val mSize: Int) : NotifyItem() {
+    class NewData(private val count: Int) : NotifyItem() {
         override fun dispatch(adapter: RecyclerView.Adapter<*>) {
-            adapter.notifyItemRangeInserted(0, mSize)
+            adapter.notifyItemRangeInserted(0, count)
         }
     }
 
-    //刷新数据
+    class LoadData(private val index: Int, private val count: Int) : NotifyItem() {
+        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
+            adapter.notifyItemRangeInserted(index, count)
+        }
+    }
+
+    class ClearData(private val count: Int) : NotifyItem() {
+        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
+            adapter.notifyItemRangeRemoved(0, count)
+        }
+    }
+
+    class RemoveData(private val index: Int, private val count: Int = 1) : NotifyItem() {
+        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
+            adapter.notifyItemRangeRemoved(index, count)
+        }
+    }
+
+    class UpdateData(private val position: Int, private val count: Int = 1) : NotifyItem() {
+        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
+            adapter.notifyItemRangeChanged(position, count)
+        }
+    }
+
     class RefreshData(private val diffResult: DiffUtil.DiffResult) : NotifyItem() {
         override fun dispatch(adapter: RecyclerView.Adapter<*>) {
             diffResult.dispatchUpdatesTo(adapter)
-        }
-    }
-
-    //加载更多
-    class LoadData(private val mStart: Int, private val mSize: Int) : NotifyItem() {
-        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
-            adapter.notifyItemRangeInserted(mStart, mSize)
-        }
-
-    }
-
-    //清空数据
-    class ClearData(private val mSize: Int) : NotifyItem() {
-        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
-            adapter.notifyItemRangeRemoved(0, mSize)
-        }
-
-    }
-
-    //更新指定数据
-    class UpdateData(private val position: Int) : NotifyItem() {
-        override fun dispatch(adapter: RecyclerView.Adapter<*>) {
-            adapter.notifyItemChanged(position)
         }
     }
 }

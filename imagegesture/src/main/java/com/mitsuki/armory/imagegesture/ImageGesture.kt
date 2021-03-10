@@ -1,12 +1,9 @@
 package com.mitsuki.armory.imagegesture
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
@@ -16,10 +13,7 @@ import android.view.animation.Transformation
 import android.widget.ImageView
 import android.widget.OverScroller
 import androidx.core.view.ViewCompat
-import kotlin.math.absoluteValue
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
+import kotlin.math.*
 
 @SuppressLint("ClickableViewAccessibility")
 class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTouchListener,
@@ -30,8 +24,6 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
             field = startType
             initBase()
         }
-
-    var parentScrollOrientation: Orientation = Orientation.HORIZONTAL
 
     private val mDrawMatrix = Matrix()
     private val mBaseMatrix = Matrix()
@@ -101,37 +93,39 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
         val viewWidth = mImageView.width
         val viewHeight = mImageView.height
         finalMatrix.getDisplayRect()
-        mImageView.parent?.requestDisallowInterceptTouchEvent(true)
+
         if (distanceX > 0) {
-            if (mDisplayRect.right > viewWidth) {
-                handled = true
-            } else {
-                if (parentScrollOrientation == Orientation.HORIZONTAL)
+            if (mDisplayRect.right > viewWidth) handled = true
+            else {
+                if (abs((e2?.x ?: 0f) - (e1?.x ?: 0f)) - abs((e2?.y ?: 0f) - (e1?.y ?: 0f)) > 64) {
                     mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+                }
             }
         } else {
-            if (mDisplayRect.left < 0f) {
-                handled = true
-            } else {
-                if (parentScrollOrientation == Orientation.HORIZONTAL)
+            if (mDisplayRect.left < 0f) handled = true
+            else {
+                if (abs((e2?.x ?: 0f) - (e1?.x ?: 0f)) - abs((e2?.y ?: 0f) - (e1?.y ?: 0f)) > 64) {
                     mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+                }
             }
         }
+
         if (distanceY > 0) {
-            if (mDisplayRect.bottom > viewHeight) {
-                handled = true
-            } else {
-                if (parentScrollOrientation == Orientation.VERTICAL)
+            if (mDisplayRect.bottom > viewHeight) handled = true
+            else {
+                if (abs((e2?.y ?: 0f) - (e1?.y ?: 0f)) - abs((e2?.x ?: 0f) - (e1?.x ?: 0f)) > 64) {
                     mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+                }
             }
         } else {
-            if (mDisplayRect.top < 0f) {
-                handled = true
-            } else {
-                if (parentScrollOrientation == Orientation.VERTICAL)
+            if (mDisplayRect.top < 0f) handled = true
+            else {
+                if (abs((e2?.y ?: 0f) - (e1?.y ?: 0f)) - abs((e2?.x ?: 0f) - (e1?.x ?: 0f)) > 64) {
                     mImageView.parent?.requestDisallowInterceptTouchEvent(false)
+                }
             }
         }
+
         if (handled) {
             mDecoMatrix.postTranslate(-distanceX, -distanceY)
             updateImageMatrix()
@@ -166,19 +160,28 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
     }
 
     /** View.OnTouchListener **********************************************************************/
-    override fun onTouch(v: View?, event: MotionEvent?): Boolean {
-        if (event?.actionMasked == MotionEvent.ACTION_DOWN) {
-            mCurrentFlingRunnable.finish()
-            mImageView.clearAnimation()
-            v?.parent?.requestDisallowInterceptTouchEvent(true)
+    override fun onTouch(v: View?, event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                mCurrentFlingRunnable.finish()
+                mImageView.clearAnimation()
+                v?.parent?.requestDisallowInterceptTouchEvent(true)
+            }
+            MotionEvent.ACTION_UP -> {
+                v?.parent?.requestDisallowInterceptTouchEvent(false)
+            }
         }
+
         var handled = false
+
         if (mScaleGestureDetector.onTouchEvent(event)) {
             handled = true
         }
+
         if (mGestureDetector.onTouchEvent(event)) {
             handled = true
         }
+
         return handled
     }
 

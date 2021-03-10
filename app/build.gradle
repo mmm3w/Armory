@@ -56,4 +56,9 @@ dependencies {
     implementation project(':armory')
     implementation project(':httprookie')
     implementation project(':systemoverlay')
+    implementation project(':imagegesture')
+
+
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation("io.coil-kt:coil:1.1.1")
 }
