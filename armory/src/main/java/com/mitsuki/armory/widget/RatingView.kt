@@ -1,33 +1,67 @@
 package com.mitsuki.armory.widget
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import com.mitsuki.armory.R
 import com.mitsuki.armory.extend.dp2px
+import kotlin.math.floor
 import kotlin.math.min
 
 class RatingView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
     var baseSize = dp2px(16f)
         set(value) {
-            field = value
-            postInvalidate()
+            if (field != value) {
+
+                borderDrawable?.setBounds(0, 0, value, value)
+                halfDrawable?.setBounds(0, 0, value, value)
+                solidDrawable?.setBounds(0, 0, value, value)
+
+                field = value
+                postInvalidate()
+            }
         }
 
-    var intervalPadding = dp2px(2f)
+    var intervalPadding = dp2px(8f)
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidate()
+            }
+        }
+
     var maxRating = 5
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidate()
+            }
+        }
+
     var rating = -1f
+        set(value) {
+            if (field != value) {
+                field = value
+                postInvalidate()
+            }
+        }
 
     var adaptive = true
         set(value) {
-            field = value
-            postInvalidate()
+            if (field != value) {
+                field = value
+                postInvalidate()
+            }
         }
 
     var borderDrawable = obtainDrawable(R.drawable.ic_baseline_star_border_16)
@@ -69,29 +103,49 @@ class RatingView @JvmOverloads constructor(
     }
 
     override fun onDraw(canvas: Canvas?) {
-        val saved = canvas?.save()
-        canvas?.translate(paddingLeft.toFloat(), paddingTop.toFloat())
-        for (i in 0 until maxRating) {
-            if (rating < 0) {
-                borderDrawable?.draw(canvas!!)
-                canvas?.translate((baseSize + intervalPadding).toFloat(), 0f)
-                continue
-            }
+        canvas?.apply {
+            val saved = save()
+            translate(paddingLeft.toFloat(), paddingTop.toFloat())
+            for (i in 0 until maxRating) {
+                if (rating < 0) {
+                    borderDrawable?.draw(this)
+                    translate((baseSize + intervalPadding).toFloat(), 0f)
+                    continue
+                }
 
-            (rating - i).let {
-                if (it >= 0.75) {
-                    solidDrawable?.draw(canvas!!)
-                    canvas?.translate((baseSize + intervalPadding).toFloat(), 0f)
-                } else if (it < 0.75 && it >= 0.25) {
-                    halfDrawable?.draw(canvas!!)
-                    canvas?.translate((baseSize + intervalPadding).toFloat(), 0f)
-                } else {
-                    borderDrawable?.draw(canvas!!)
-                    canvas?.translate((baseSize + intervalPadding).toFloat(), 0f)
+                (rating - i).let {
+                    if (it >= 0.75) {
+                        solidDrawable?.draw(this)
+                        translate((baseSize + intervalPadding).toFloat(), 0f)
+                    } else if (it < 0.75 && it >= 0.25) {
+                        halfDrawable?.draw(this)
+                        translate((baseSize + intervalPadding).toFloat(), 0f)
+                    } else {
+                        borderDrawable?.draw(this)
+                        translate((baseSize + intervalPadding).toFloat(), 0f)
+                    }
+                }
+            }
+            restoreToCount(saved)
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        var handle = super.onTouchEvent(event)
+
+        if (isEnabled) {
+            with(event.x - paddingLeft) {
+                if (this > 0) {
+                    val i = floor(this / (baseSize + intervalPadding)).toInt()
+                    val remainder = this % (baseSize + intervalPadding)
+                    rating = if (remainder > baseSize / 2) i + 1f else i + 0.5f
+                    handle = true
                 }
             }
         }
-        canvas?.restoreToCount(saved!!)
+
+        return handle
     }
 
     fun setDrawable(

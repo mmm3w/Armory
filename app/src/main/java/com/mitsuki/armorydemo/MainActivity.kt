@@ -14,7 +14,5 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(root) }
 
-        binding.mainPager.adapter = PagerAdapter(this)
-
     }
 }
