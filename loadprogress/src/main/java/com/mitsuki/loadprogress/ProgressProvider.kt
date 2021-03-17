@@ -1,5 +1,6 @@
 package com.mitsuki.loadprogress
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
 
@@ -11,7 +12,8 @@ object ProgressProvider {
 
     val imageLoadInterceptor = LoadInterceptor(mProgressSubject)
 
-    fun event(tag: String): Observable<Progress> = mProgressSubject.hide().filter { it.tag == tag }
+    fun event(tag: String): Observable<Progress> =
+        mProgressSubject.hide().filter { it.tag == tag }.observeOn(AndroidSchedulers.mainThread())
 
     fun decorateUrl(url: String, tag: String): String {
         val stringBuilder = StringBuilder(url)

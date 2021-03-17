@@ -57,6 +57,7 @@ dependencies {
     implementation project(':httprookie')
     implementation project(':systemoverlay')
     implementation project(':imagegesture')
+    implementation project(':loadprogress')
 
 
     implementation "androidx.viewpager2:viewpager2:1.0.0"
