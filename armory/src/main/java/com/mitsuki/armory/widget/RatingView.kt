@@ -32,7 +32,7 @@ class RatingView @JvmOverloads constructor(
             }
         }
 
-    var intervalPadding = dp2px(8f)
+    var intervalPadding = dp2px(2f)
         set(value) {
             if (field != value) {
                 field = value
