@@ -1,3 +1,4 @@
+include ':loadprogress'
 include ':systemoverlay'
 include ':httprookie'
 include ':imagegesture'
