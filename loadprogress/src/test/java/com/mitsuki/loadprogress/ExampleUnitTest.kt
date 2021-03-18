@@ -12,10 +12,10 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun parseTest() {
-        val url = "https://www.baidu.com/"
+        val url = "https://www.baidu.com/dfg.sol"
         val deco = ProgressProvider.decorateUrl(url, "asdf")
         println(deco)
-        val pair = ProgressProvider.cleanUrl(deco)
+        val pair = ProgressProvider.cleanUrl(deco + "?id=456468484")
         println(pair)
     }
 }
