@@ -11,7 +11,11 @@ import org.junit.Assert.*
  */
 class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun parseTest() {
+        val url = "https://www.baidu.com/"
+        val deco = ProgressProvider.decorateUrl(url, "asdf")
+        println(deco)
+        val pair = ProgressProvider.cleanUrl(deco)
+        println(pair)
     }
 }

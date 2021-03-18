@@ -6,7 +6,8 @@ import io.reactivex.rxjava3.subjects.PublishSubject
 
 object ProgressProvider {
 
-    private const val URL_MARK = "MTKMark="
+    private const val URL_MARK = "MTKMark"
+    private const val MARK_FORMAT = "$URL_MARK=%s:"
 
     private val mProgressSubject: PublishSubject<Progress> by lazy { PublishSubject.create() }
 
@@ -16,18 +17,12 @@ object ProgressProvider {
         mProgressSubject.hide().filter { it.tag == tag }.observeOn(AndroidSchedulers.mainThread())
 
     fun decorateUrl(url: String, tag: String): String {
-        val stringBuilder = StringBuilder(url)
-        return if (stringBuilder.contains("?")) {
-            stringBuilder.append("&")
-        } else {
-            stringBuilder.append("?")
-        }.append("$URL_MARK$tag").toString()
+        return String.format(MARK_FORMAT, tag) + url
     }
 
     fun cleanUrl(url: String): Pair<String, String> {
         return if (url.contains(URL_MARK))
-            url.substring(0, url.indexOf(URL_MARK) - 1) to url.substring(url.indexOf(URL_MARK))
-                .replace(URL_MARK, "")
+            url.substring(url.indexOf(":") + 1) to url.substring(0, url.indexOf(":")).substring(8)
         else
             url to ""
     }
