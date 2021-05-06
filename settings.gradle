@@ -1,3 +1,4 @@
+include ':inputmeasure'
 include ':loadprogress'
 include ':systemoverlay'
 include ':httprookie'

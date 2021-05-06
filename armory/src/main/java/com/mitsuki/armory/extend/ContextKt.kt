@@ -12,31 +12,11 @@ import androidx.core.content.res.use
 import androidx.fragment.app.Fragment
 
 /** toast *****************************************************************************************/
-fun Context.toast(value: String) =
-    Toast.makeText(this, value, Toast.LENGTH_SHORT).show()
+fun Context.toast(value: String, duration: Int = Toast.LENGTH_SHORT) =
+    Toast.makeText(this, value, duration).show()
 
-fun Context.toastLong(value: String) =
-    Toast.makeText(this, value, Toast.LENGTH_LONG).show()
-
-fun Fragment.toast(value: String) = context?.toast(value)
-
-fun Fragment.toastLong(value: String) = context?.toastLong(value)
-
-/** soft input ************************************************************************************/
-fun Activity.showSoftInput() =
-    currentFocus?.let {
-        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(it, 0)
-    } ?: false
-
-fun Activity.hideSoftInput() =
-    currentFocus?.let {
-        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-            .hideSoftInputFromWindow(it.windowToken, 0)
-    } ?: false
-
-fun Fragment.showSoftInput() = requireActivity().showSoftInput()
-
-fun Fragment.hideSoftInput() = requireActivity().hideSoftInput()
+fun Fragment.toast(value: String, duration: Int = Toast.LENGTH_SHORT) =
+    context?.toast(value, duration)
 
 /**************************************************************************************************/
 

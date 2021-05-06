@@ -23,9 +23,9 @@ class RatingView @JvmOverloads constructor(
         set(value) {
             if (field != value) {
 
-                borderDrawable?.setBounds(0, 0, value, value)
-                halfDrawable?.setBounds(0, 0, value, value)
-                solidDrawable?.setBounds(0, 0, value, value)
+                borderDrawable?.setBounds(0, 0, value.toInt(), value.toInt())
+                halfDrawable?.setBounds(0, 0, value.toInt(), value.toInt())
+                solidDrawable?.setBounds(0, 0, value.toInt(), value.toInt())
 
                 field = value
                 postInvalidate()
@@ -88,18 +88,18 @@ class RatingView @JvmOverloads constructor(
         val height = when (heightMode) {
             MeasureSpec.EXACTLY -> {
                 if (adaptive) {
-                    baseSize = min(heightSize - paddingTop - paddingBottom, baseSize)
+                    baseSize = min((heightSize - paddingTop - paddingBottom).toFloat(), baseSize)
                 }
                 heightSize
             }
             else -> baseSize + paddingTop + paddingBottom
         }
 
-        borderDrawable?.setBounds(0, 0, baseSize, baseSize)
-        halfDrawable?.setBounds(0, 0, baseSize, baseSize)
-        solidDrawable?.setBounds(0, 0, baseSize, baseSize)
+        borderDrawable?.setBounds(0, 0, baseSize.toInt(), baseSize.toInt())
+        halfDrawable?.setBounds(0, 0, baseSize.toInt(), baseSize.toInt())
+        solidDrawable?.setBounds(0, 0, baseSize.toInt(), baseSize.toInt())
 
-        setMeasuredDimension(width, height)
+        setMeasuredDimension(width.toInt(), height.toInt())
     }
 
     override fun onDraw(canvas: Canvas?) {
