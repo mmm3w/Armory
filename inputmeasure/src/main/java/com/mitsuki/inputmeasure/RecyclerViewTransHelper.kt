@@ -3,6 +3,7 @@ package com.mitsuki.inputmeasure
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -12,7 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class RecyclerViewTransHelper(
     private val lifecycleOwner: LifecycleOwner,
-    private val recyclerView: RecyclerView
+    private val recyclerView: RecyclerView,
+    private val transTarget: View
 ) :
     RecyclerView.AdapterDataObserver(), LifecycleObserver {
 
@@ -40,9 +42,9 @@ class RecyclerViewTransHelper(
     fun transAnimator(referHeight: Int): Animator {
         lastReferHeight = referHeight
         return ObjectAnimator.ofFloat(
-            recyclerView,
+            transTarget,
             "translationY",
-            recyclerView.translationY,
+            transTarget.translationY,
             (lastBottom() - referHeight).coerceAtMost(0).toFloat()
         )
     }
