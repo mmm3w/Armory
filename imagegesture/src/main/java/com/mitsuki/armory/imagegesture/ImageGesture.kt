@@ -16,7 +16,7 @@ import androidx.core.view.ViewCompat
 import kotlin.math.*
 
 @SuppressLint("ClickableViewAccessibility")
-class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTouchListener,
+open class ImageGesture(protected val mImageView: ImageView) : AllGesture(), View.OnTouchListener,
     View.OnLayoutChangeListener {
 
     var startType = StartType.AUTO_LEFT
@@ -54,8 +54,8 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
     }
 
     /** GestureListener ***************************************************************************/
-    override fun onScale(detector: ScaleGestureDetector?): Boolean {
-        return detector?.run {
+    final override fun onScale(detector: ScaleGestureDetector): Boolean {
+        return detector.run {
             var handled = false
             val currentScale = mDecoMatrix.getScale()
             if (scaleFactor > 1f && currentScale < MAX_SCALE) {
@@ -83,10 +83,10 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
                 handled = true
             }
             handled
-        } ?: false
+        }
     }
 
-    override fun onScroll(
+    final override fun onScroll(
         e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float
     ): Boolean {
         var handled = false
@@ -133,7 +133,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
         return handled
     }
 
-    override fun onFling(
+    final override fun onFling(
         e1: MotionEvent?, e2: MotionEvent?, velocityX: Float, velocityY: Float
     ): Boolean {
         //velocityX < 0 手指向左滑动
@@ -145,8 +145,8 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
         return true
     }
 
-    override fun onDoubleTap(e: MotionEvent?): Boolean {
-        e?.apply {
+    final override fun onDoubleTap(e: MotionEvent): Boolean {
+        e.apply {
             val currentScale = mDecoMatrix.getScale()
             if (currentScale > 1f) {
                 if (!mScaleDownAnimation.isAnimationRunning())
@@ -160,7 +160,7 @@ class ImageGesture(private val mImageView: ImageView) : AllGesture(), View.OnTou
     }
 
     /** View.OnTouchListener **********************************************************************/
-    override fun onTouch(v: View?, event: MotionEvent): Boolean {
+    final override fun onTouch(v: View?, event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 mCurrentFlingRunnable.finish()

@@ -18,7 +18,7 @@ class PutRequest<T : Any>(url: String) : Request<T>(url), HasBody {
 
     override fun generateRequest(): okhttp3.Request {
         val requestBody = generateRequestBody()
-        header(Headers.HEAD_CONTENT_LENGTH to requestBody.contentLength().toString())
+        header(Headers.HEAD_CONTENT_LENGTH, requestBody.contentLength().toString())
         return generateRequestBuilder().tag(tag).put(requestBody).url(url()).build()
     }
 

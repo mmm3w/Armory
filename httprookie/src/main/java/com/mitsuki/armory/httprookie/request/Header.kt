@@ -8,10 +8,10 @@ interface Headers {
     }
 }
 
-fun Headers.header(header: Pair<String, String>) {
-    if (header.second.isEmpty()) return
-    if (header.first.isEmpty()) return
-    headers[header.first] = header.second
+fun Headers.header(key: String, value: String) {
+    if (key.isEmpty()) return
+    if (value.isEmpty()) return
+    headers[key] = value
 }
 
 fun Headers.header(data: Headers) {

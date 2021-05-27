@@ -65,9 +65,9 @@ fun HasBody.json(data: String) {
     this.mediaType = HasBody.JSON
 }
 
-fun HasBody.params(data: Pair<String, String>) {
+fun HasBody.params(key: String, value: String) {
     this.type = HasBody.Type.NONE
-    bodyParams.add(data)
+    bodyParams.add(key to value)
 }
 
 fun HasBody.requestBody(data: RequestBody) {

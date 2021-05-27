@@ -6,11 +6,11 @@ interface UrlParams {
     val urlParams: LinkedHashMap<String, MutableList<String>>
 }
 
-fun UrlParams.urlParams(kv: Pair<String, String>) {
-    if (kv.first.isEmpty()) return
-    if (kv.second.isEmpty()) return
-    urlParams[kv.first]?.add(kv.second) ?: {
-        urlParams[kv.first] = arrayListOf(kv.second)
+fun UrlParams.urlParams(key: String, value: String) {
+    if (key.isEmpty()) return
+    if (value.isEmpty()) return
+    urlParams[key]?.add(value) ?: {
+        urlParams[key] = arrayListOf(value)
     }()
 }
 
