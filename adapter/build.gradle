@@ -33,9 +33,12 @@ android {
 }
 
 dependencies {
-
     implementation deps.kotlin.stdlib
     implementation deps.core_ktx
+
+    implementation deps.coroutines.core
+    implementation deps.coroutines.android
+    implementation deps.lifecycle.runtime
 
     androidTestImplementation deps.atsl.ext_junit
     androidTestImplementation deps.espresso.core

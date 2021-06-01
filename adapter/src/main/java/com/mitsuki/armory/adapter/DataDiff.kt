@@ -26,17 +26,15 @@ class DataDiff<T>(
     }
 }
 
-inline fun <reified T> calculateDiff(
+fun <T> calculateDiff(
     diff: DiffUtil.ItemCallback<T>,
     oldList: List<T>,
     newList: List<T>
 ): DiffUtil.DiffResult {
-    return DiffUtil.calculateDiff(
-        DataDiff(diff, oldList, newList)
-    )
+    return DiffUtil.calculateDiff(DataDiff(diff, oldList, newList))
 }
 
-inline fun <reified T> calculateDiff(
+fun <T> calculateDiff(
     diff: DiffUtil.ItemCallback<T>,
     oldList: Array<T>,
     newList: Array<T>
