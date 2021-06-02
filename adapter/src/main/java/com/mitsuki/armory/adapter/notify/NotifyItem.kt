@@ -1,4 +1,4 @@
-package com.mitsuki.armory.adapter
+package com.mitsuki.armory.adapter.notify
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
