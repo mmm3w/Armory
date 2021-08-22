@@ -7,6 +7,7 @@ import androidx.annotation.MainThread
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import java.lang.ref.WeakReference
+import java.util.ArrayDeque
 
 class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
 
@@ -15,14 +16,15 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
     fun item(index: Int) = mData[index]
 
     private val mDelivery: Handler by lazy { Handler(Looper.getMainLooper()) }
-    private val mWorkThread: HandlerThread by lazy { HandlerThread("NotifyQueueData") }
+    private val mWorkThread: HandlerThread by lazy { HandlerThread("NotifyQueueData").apply { start() } }
+    private val mHanlder = Handler(mWorkThread.looper)
 
     private val pendingUpdates: ArrayDeque<NotifyData<T>> = ArrayDeque()
     private var targetAdapter: WeakReference<RecyclerView.Adapter<*>>? = null
 
     @MainThread
     fun postUpdate(data: NotifyData<T>) {
-        pendingUpdates.addFirst(data)
+        pendingUpdates.add(data)
         if (pendingUpdates.size > 1) return
         updateData(data)
     }
@@ -39,10 +41,9 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
             is NotifyData.RangeRemove,
             is NotifyData.ChangeIf,
             is NotifyData.Refresh -> {
-                mWorkThread.run {
+                mHanlder.post {
                     data.calculateDiff(mData, diffCallback)
-                    mDelivery.run { applyNotify(data) }
-
+                    mDelivery.post { applyNotify(data) }
                 }
             }
         }
@@ -50,9 +51,11 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
 
     @MainThread
     private fun applyNotify(notifyData: NotifyData<T>) {
+        pendingUpdates.remove()
         targetAdapter?.get()?.apply { notifyData.dispatchUpdates(mData, this) }
-        pendingUpdates.removeLast()
-        if (pendingUpdates.isNotEmpty()) updateData(pendingUpdates.last())
+        if (pendingUpdates.isNotEmpty()) {
+            pendingUpdates.peek()?.apply { updateData(this) }
+        }
     }
 
     fun attachAdapter(adapter: RecyclerView.Adapter<*>) {

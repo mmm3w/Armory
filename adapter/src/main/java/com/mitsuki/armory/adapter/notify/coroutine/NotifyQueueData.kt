@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.ref.WeakReference
+import java.util.ArrayDeque
 
 class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
 
@@ -16,7 +17,7 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
 
     val count get() = mData.size
 
-    fun item(index:Int) = mData[index]
+    fun item(index: Int) = mData[index]
 
     private val pendingUpdates: ArrayDeque<NotifyData<T>> = ArrayDeque()
     private var targetAdapter: WeakReference<RecyclerView.Adapter<*>>? = null
@@ -26,7 +27,7 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
     }
 
     suspend fun postUpdate(data: NotifyData<T>) {
-        pendingUpdates.addFirst(data)
+        pendingUpdates.add(data)
         if (pendingUpdates.size > 1) return
         updateData(data)
     }
@@ -51,9 +52,11 @@ class NotifyQueueData<T>(private val diffCallback: DiffUtil.ItemCallback<T>) {
     }
 
     private suspend fun applyNotify(notifyData: NotifyData<T>) {
+        pendingUpdates.remove()
         targetAdapter?.get()?.apply { notifyData.dispatchUpdates(mData, this) }
-        pendingUpdates.removeLast()
-        if (pendingUpdates.isNotEmpty()) updateData(pendingUpdates.last())
+        if (pendingUpdates.isNotEmpty()) {
+            pendingUpdates.peek()?.apply { updateData(this) }
+        }
     }
 
     fun attachAdapter(adapter: RecyclerView.Adapter<*>) {
