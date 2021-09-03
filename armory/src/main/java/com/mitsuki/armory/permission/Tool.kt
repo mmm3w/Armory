@@ -1,4 +1,4 @@
-package com.mitsuki.armory
+package com.mitsuki.armory.permission
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -7,7 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 
-class PermissionTool(private val activityProvider: () -> ComponentActivity) {
+class Tool(private val activityProvider: () -> ComponentActivity) {
 
     companion object {
         fun checkSelfPermission(context: Context, permission: String): Boolean {
@@ -65,5 +65,3 @@ class PermissionTool(private val activityProvider: () -> ComponentActivity) {
         }
     }
 }
-
-fun ComponentActivity.permissionTool() :PermissionTool = PermissionTool { this }
