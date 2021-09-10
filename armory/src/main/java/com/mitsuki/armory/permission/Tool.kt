@@ -7,61 +7,23 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
 
-class Tool(private val activityProvider: () -> ComponentActivity) {
+object Tool {
 
-    companion object {
-        fun checkSelfPermission(context: Context, permission: String): Boolean {
-            return ContextCompat.checkSelfPermission(
-                context,
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-
-        fun checkSelfPermission(context: Context, permission: Array<String>): Boolean {
-            for (item in permission) {
-                if (ContextCompat.checkSelfPermission(context, item)
-                    != PackageManager.PERMISSION_GRANTED
-                ) {
-                    return false
-                }
-            }
-            return true
-        }
+    fun checkSelfPermission(context: Context, permission: String): Boolean {
+        return ContextCompat.checkSelfPermission(
+            context,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private val permissionLauncher =
-        activityProvider().registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-
-        }
-
-    private val multiplePermissionLauncher =
-        activityProvider().registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-
-        }
-
-    fun requestPermission(code: Int, permission: String, result: ((Boolean) -> Unit)? = null) {
-        activityProvider.invoke().apply {
-            if (checkSelfPermission(this, permission)) {
-                result?.invoke(true)
-            } else {
-                //
-                permissionLauncher.launch(permission)
+    fun checkSelfPermission(context: Context, permission: Array<String>): Boolean {
+        for (item in permission) {
+            if (ContextCompat.checkSelfPermission(context, item)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                return false
             }
         }
-    }
-
-    fun requestPermission(
-        code: Int,
-        permission: Array<String>,
-        result: ((List<String>, List<String>) -> Unit)? = null
-
-    ) {
-        activityProvider.invoke().apply {
-            if (checkSelfPermission(this, permission)) {
-                result?.invoke(permission.toList(), emptyList())
-            } else {
-                multiplePermissionLauncher.launch(permission)
-            }
-        }
+        return true
     }
 }

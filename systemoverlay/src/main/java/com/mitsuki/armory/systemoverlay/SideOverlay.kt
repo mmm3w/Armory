@@ -1,4 +1,4 @@
-package com.mitsuki.systemoverlay
+package com.mitsuki.armory.systemoverlay
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint

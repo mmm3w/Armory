@@ -1,4 +1,4 @@
-package com.mitsuki.systemoverlay
+package com.mitsuki.armory.systemoverlay
 
 import android.content.Context
 import android.graphics.Point

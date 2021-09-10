@@ -1,10 +1,9 @@
-package com.mitsuki.systemoverlay
+package com.mitsuki.armory.systemoverlay
 
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PixelFormat
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View

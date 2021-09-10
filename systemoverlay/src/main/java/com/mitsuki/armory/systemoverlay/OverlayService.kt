@@ -1,4 +1,4 @@
-package com.mitsuki.systemoverlay
+package com.mitsuki.armory.systemoverlay
 
 import android.app.Service
 import android.content.Intent
