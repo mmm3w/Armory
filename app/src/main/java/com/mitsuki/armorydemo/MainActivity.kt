@@ -5,11 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.mitsuki.armory.httprookie.HttpRookie
-import com.mitsuki.armory.httprookie.convert.FileConvert
 import com.mitsuki.armorydemo.databinding.ActivityMainBinding
-import com.mitsuki.loadprogress.ProgressProvider
-import com.mitsuki.loadprogress.addFeature
 import java.io.File
 
 class MainActivity : AppCompatActivity() {

@@ -40,6 +40,7 @@ dependencies {
     implementation deps.coroutines.android
     implementation deps.lifecycle.runtime
 
+    testImplementation deps.junit
     androidTestImplementation deps.atsl.ext_junit
     androidTestImplementation deps.espresso.core
 
