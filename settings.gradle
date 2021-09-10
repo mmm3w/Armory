@@ -1,7 +1,6 @@
 include ':inputmeasure'
 include ':loadprogress'
 include ':systemoverlay'
-include ':httprookie'
 include ':imagegesture'
 include ':adapter'
 include ':armory'
