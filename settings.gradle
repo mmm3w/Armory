@@ -1,5 +1,2 @@
-include ':inputmeasure'
-include ':systemoverlay'
-include ':adapter'
-include ':app'
 rootProject.name = "ArmoryDemo"
+include ':app'
