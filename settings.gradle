@@ -1,8 +1,5 @@
 include ':inputmeasure'
-include ':loadprogress'
 include ':systemoverlay'
-include ':imagegesture'
 include ':adapter'
-include ':armory'
 include ':app'
 rootProject.name = "ArmoryDemo"
