@@ -9,7 +9,7 @@ newContent = ''
 with io.open(targetRead, 'r', encoding='utf-8') as f:
     for line in f:
         if key in line:
-            newContent += implementation
+            newContent += implementation + '\n'
         else:
             newContent += line
 
