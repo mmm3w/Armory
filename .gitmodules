@@ -1,0 +1,3 @@
+[submodule "inputmeasure"]
+	path = inputmeasure
+	url = https://github.com/mmm3w/inputmeasure.git

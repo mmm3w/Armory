@@ -1,2 +1,4 @@
 rootProject.name = "ArmoryDemo"
 include ':app'
+
+include ':inputmeasure'
