@@ -3,8 +3,12 @@ package com.mitsuki.armorydemo
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.vectordrawable.graphics.drawable.AnimationUtilsCompat
 import com.mitsuki.armory.inputmeasure.*
 import com.mitsuki.armorydemo.databinding.ActivityMainBinding
 
@@ -12,16 +16,23 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val inputMeasure by lazy { InputMeasurePopupWindow(this) }
     private var tag = 0;
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e("asdf", this.hashCode().toString())
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(root) }
         refreshSize()
-        lifecycle.addObserver(inputMeasure)
+
+        InputHeight.call = {
+            ViewCompat.animate(binding.baseLine)
+                .translationY((-it).toFloat())
+                .setDuration(200)
+                .start()
+        }
+        InputHeight.bindMeasure(this)
+
+
         //隐藏导航栏 隐藏状态栏
         //真隐藏（看不见）
         //假隐藏（看的见，但是布局会延伸上去）
@@ -76,7 +87,9 @@ class MainActivity : AppCompatActivity() {
         binding.hintText.text = "screenWidth:$screenWidth\n" +
                 "screenHeight:$screenHeight\n\n" +
                 "displayWidth：$displayWidth\n" +
-                "displayHeight：$displayHeight\n"
+                "displayHeight：$displayHeight\n" +
+                "navigationBarHeight：${navigationBarHeight()}\n"+
+                "statusBarHeight：${statusBarHeight()}"
 
     }
 
