@@ -53,14 +53,4 @@ dependencies {
     implementation deps.reactivex.rxjava3
     implementation deps.reactivex.rxandroid
 
-//    implementation project(':inputmeasure')
-
-//    implementation project(':armory')
-//    implementation project(':systemoverlay')
-//    implementation project(':imagegesture')
-//    implementation project(':loadprogress')
-//
-//
-//    implementation "androidx.viewpager2:viewpager2:1.0.0"
-//    implementation("io.coil-kt:coil:1.1.1")
 }
