@@ -52,5 +52,4 @@ dependencies {
 
     implementation deps.reactivex.rxjava3
     implementation deps.reactivex.rxandroid
-
 }

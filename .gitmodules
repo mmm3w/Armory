@@ -1,6 +1,0 @@
-[submodule "inputmeasure"]
-	path = inputmeasure
-	url = git@github.com:mmm3w/inputmeasure.git
-[submodule "base"]
-	path = base
-	url = git@github.com:mmm3w/base.git
