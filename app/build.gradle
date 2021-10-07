@@ -54,4 +54,5 @@ dependencies {
     implementation deps.reactivex.rxandroid
 
     implementation project(':base')
+    implementation project(':adapter')
 }

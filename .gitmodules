@@ -1,3 +1,6 @@
 [submodule "base"]
 	path = base
 	url = git@github.com:mmm3w/base.git
+[submodule "adapter"]
+	path = adapter
+	url = git@github.com:mmm3w/adapter.git
