@@ -7,22 +7,4 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/hint_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <View
-        android:id="@+id/base_line"
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_gravity="bottom"
-        android:background="#ff0000" />
-
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom" />
-
 </FrameLayout>
