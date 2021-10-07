@@ -53,7 +53,7 @@ dependencies {
     implementation deps.reactivex.rxjava3
     implementation deps.reactivex.rxandroid
 
-    implementation project(':inputmeasure')
+//    implementation project(':inputmeasure')
 
 //    implementation project(':armory')
 //    implementation project(':systemoverlay')
