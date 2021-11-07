@@ -2,3 +2,5 @@ rootProject.name = "ArmoryDemo"
 include ':app'
 include ':base'
 include ':adapter'
+include ':timetrace'
+include ':piledriver'

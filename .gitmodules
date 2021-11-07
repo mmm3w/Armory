@@ -4,3 +4,9 @@
 [submodule "adapter"]
 	path = adapter
 	url = git@github.com:mmm3w/adapter.git
+[submodule "timetrace"]
+	path = timetrace
+	url = git@github.com:mmm3w/timetrace.git
+[submodule "piledriver"]
+	path = piledriver
+	url = git@github.com:mmm3w/piledriver.git
