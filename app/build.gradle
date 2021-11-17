@@ -56,4 +56,5 @@ dependencies {
     implementation project(':base')
     implementation project(':adapter')
     implementation project(':timetrace')
+    implementation project(':inputmeasure')
 }
