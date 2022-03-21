@@ -1,6 +1,8 @@
 package com.mitsuki.armorydemo
 
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import com.mitsuki.armory.inputmeasure.InputHeight
@@ -13,15 +15,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(root) }
-        InputHeight.callback {
-            ViewCompat.animate(binding.mainInput).also { viewAnimator ->
-                viewAnimator.cancel()
-                viewAnimator.translationY((-it).toFloat())
-                    .setDuration(150)
-                    .start()
-            }
-        }
-        InputHeight.bindMeasure(this)
+
+
+        SignatureCompact.getSignature(this)
+
     }
 
 }
