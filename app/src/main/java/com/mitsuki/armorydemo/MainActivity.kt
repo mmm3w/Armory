@@ -2,46 +2,38 @@ package com.mitsuki.armorydemo
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.mitsuki.armorydemo.ui.theme.ArmorydemoTheme
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import com.mitsuki.armory.base.ext.dp2px
+import com.mitsuki.armorydemo.databinding.ActivityMainBinding
+import com.mitsuki.armory.base.ext.viewBinding
+import com.mitsuki.armory.base.view.drawable.HeartDrawable
+
 
 class MainActivity : ComponentActivity() {
+
+    val binding by viewBinding(ActivityMainBinding::inflate)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ArmorydemoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+        binding.mainAdapter.setOnClickListener {
+
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        val imageDrawable = HeartDrawable().apply {
+            heartColor = Color.Red.toArgb()
+            heartHintColor = 0xffaeaeae.toInt()
+            heartHintStroke = dp2px(1.5f)
+        }
+        var isChecked = false
+        binding.mainHeart.setImageDrawable(imageDrawable)
+        binding.mainHeart.setOnClickListener {
+            isChecked = !isChecked
+            imageDrawable.setChecked(isChecked)
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ArmorydemoTheme {
-        Greeting("Android")
+
+
     }
 }

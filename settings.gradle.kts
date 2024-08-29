@@ -19,6 +19,9 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "armorydemo"
+rootProject.name = "armory"
 include(":app")
- 
+include(":base")
+include(":adapter")
+include(":httprookie")
+include(":imagegesture")
