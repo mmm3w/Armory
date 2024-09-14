@@ -41,6 +41,10 @@ class GeneralNotifyQueueData<T>(diffCallback: DiffUtil.ItemCallback<T>) :
     }
 
     override fun release() {
-        mWorkThread.quit()
+        try {
+            mWorkThread.quit()
+        }catch (e:Exception){
+
+        }
     }
 }
