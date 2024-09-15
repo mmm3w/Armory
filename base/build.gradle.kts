@@ -40,15 +40,15 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation(libs.androidx.recyclerview)
 
 
+    compileOnly(libs.androidx.recyclerview)
     compileOnly(libs.coroutines.core)
-
-
+    compileOnly(libs.androidx.activity.ktx)
 
 }
 
